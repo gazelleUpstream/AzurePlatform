@@ -4,7 +4,7 @@ name: lz - replaceMe-lz-landingzoneName
 on:
   push:
     paths:
-      - 'Landingzone/parameters/replaceMe-lz-landingzoneName.json'
+      - 'Landingzone/replaceMe-lz-landingzoneName.json'
 
   workflow_dispatch:
 
@@ -19,5 +19,5 @@ jobs:
       managementGroupName : replaceMe-lz-managementGroupName
       managementGroupSuffix: replaceMe-lz-managementGroupSuffix
       location: replaceMe-lz-location
-      parameterFile: ./parameters/replaceMe-lz-landingzoneName.json
+      parameterFile: ./Landingzone/replaceMe-lz-landingzoneName.json
     secrets: inherit

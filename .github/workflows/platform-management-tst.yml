@@ -4,7 +4,7 @@ name: lz - platform-management-tst
 on:
   push:
     paths:
-      - 'Landingzone/parameters/platform-management-tst.json'
+      - 'Landingzone/platform-management-tst.json'
 
   workflow_dispatch:
 
@@ -19,5 +19,5 @@ jobs:
       managementGroupName : platform
       managementGroupSuffix: tst
       location: replaceMe-lz-location
-      parameterFile: ./parameters/platform-management-tst.json
+      parameterFile: ./Landingzone/platform-management-tst.json
     secrets: inherit
