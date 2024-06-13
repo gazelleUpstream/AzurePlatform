@@ -1,4 +1,4 @@
-name: Policy
+name: az - Policy
 
 on:
   push:
