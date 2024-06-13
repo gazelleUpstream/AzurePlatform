@@ -23,7 +23,7 @@ permissions:
 
 jobs:
   test:
-    if: github.event_name == 'workflow_dispatch' || 
+    if: (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main') ||
         github.ref != 'refs/heads/main'
     uses: ./.github/workflows/template-Policy.yml
     with:
