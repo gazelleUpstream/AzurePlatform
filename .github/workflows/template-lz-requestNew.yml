@@ -33,7 +33,7 @@ jobs:
           $mgmtGroupSuffix = $issue.managementGroupName.Split("-")[1]
 
           $fileName = "{0}-{1}-{2}" -f $mgmtGroupName, $issue.labName, $issue.environment
-          set-content -path "Landingzone/parameters/$fileName.json" -value $issueAsJsonIndented
+          set-content -path "Landingzone/$fileName.json" -value $issueAsJsonIndented
           
           write-output "landingzoneName=$fileName" >> $env:GITHUB_ENV
           write-output "landingzoneLocation=$location" >> $env:GITHUB_ENV
