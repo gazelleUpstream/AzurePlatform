@@ -1,0 +1,115 @@
+name: new landingzone
+description: create a new landingzone
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please fill out the form below to create a new landingzone.
+
+  - type: input
+    id: labName
+    attributes:
+      label: lab Name
+      description: 
+      placeholder: bigData
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: environment
+      multiple: false
+      description:
+      options: 
+        - tst
+        - dev
+        - uat
+        - prod
+      default: 0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: managementGroupName
+    attributes:
+      label: management group name
+      multiple: false
+      description:
+      options: 
+        - landingzones-prod
+        - platform-prod
+        - playground-prod
+        - landingzones-tst
+        - platform-tst
+        - playground-tst
+      default: 0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: location
+    attributes:
+      label: location
+      description: 
+      multiple: false
+      options:
+      - FranceCentral
+      - SwitzerlandNorth
+      default: 0
+    validations:
+      required: true
+
+  - type: input
+    id: subscriptionId
+    attributes:
+      label: subscription Id
+      description: 
+      placeholder: 84e64f94-714d-4c07-9f03-f07af8380b36
+    validations:
+      required: true
+
+  - type: input
+    id: budget
+    attributes:
+      label: budget
+      description: 
+      placeholder: "100"
+    validations:
+      required: true
+
+  - type: input
+    id: githubOrganizationName
+    attributes:
+      label: GitHub organization name
+      description: 
+      placeholder: gazelle-cloud
+    validations:
+      required: true
+
+  - type: input
+    id: githubRepoName
+    attributes:
+      label: GitHub repo name
+      description:
+      placeholder: landingzone
+    validations:
+      required: true
+
+  - type: input
+    id: ownerEmail
+    attributes:
+      label: owner email
+      description: pam param
+      placeholder: param@gazelle.cloud
+    validations:
+      required: true
+
+  - type: input
+    id: engineer
+    attributes:
+      label: tag engineer
+      description: pam param
+      placeholder: foo@gazelle.cloud
+    validations:
+      required: true

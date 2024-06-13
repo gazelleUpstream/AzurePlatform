@@ -1,0 +1,109 @@
+name: template - Langingzone
+
+on:
+  workflow_call:
+    inputs:
+        managementGroupName:
+          required: true
+          type: string
+        managementGroupSuffix:
+            required: true
+            type: string
+        location:
+            default: ${{ vars.AZURE_DEFAULT_LOCATION }}
+            type: string
+        deploymentInputsMainBicep:
+            default: ./Landingzone/bicep/readOutputs.bicep
+            type: string
+        mainBicep:
+            default: ./Landingzone/bicep/main.bicep
+            type: string
+        parameterFile:
+            required: true
+            type: string
+    
+
+jobs:
+    Langingzone:
+        runs-on: ubuntu-latest
+        steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: get github token
+          id: github-token
+          uses: actions/create-github-app-token@v1
+          with:
+            app-id: ${{ vars.APP_GITHUB_BIGBANG_ID }}
+            private-key: ${{ secrets.APP_GITHUB_BIGBANG }}
+
+        - name: Azure login
+          uses: azure/login@v1
+          with:
+            client-id: ${{ vars.LANDINGZONE_CLIENT_ID }}
+            tenant-id: ${{ vars.AZURE_TENANT_ID}}
+            allow-no-subscriptions: true
+            enable-AzPSSession: false
+
+        - name: generate inputs
+          uses: azure/cli@v1
+          with:
+              inlineScript: |
+                params=$(jq -c . < ${{ inputs.parameterFile }})
+                echo "JSON content: $params"
+                
+                deployment=$(az deployment mg create \
+                --name generateInputs \
+                --management-group-id ${{ env.managementGroup }} \
+                --location ${{ inputs.location }} \
+                --template-file ${{ inputs.deploymentInputsMainBicep }} \
+                --parameters params=$params)
+
+                deploymentInputs=$(echo $deployment | jq '.properties.outputs')
+                echo "Deployment Outputs: $deploymentInputs"
+                keyValuePairs=$(echo $deploymentInputs | jq -r 'to_entries[] | "\(.key)=\(.value.value)"')
+                IFS=$'\n'
+                for output in $keyValuePairs
+                do
+                  echo $output
+                  echo "$output" >> $GITHUB_ENV
+                done
+
+        - name: rename subscription
+          uses: azure/cli@v1
+          with:
+              inlineScript: |
+                az account subscription rename  \
+                  --id ${{ env.subscriptionId }} \
+                  --name ${{ env.subscriptionName }}
+
+                az account management-group subscription add \
+                  --name ${{ env.managementGroup }} \
+                  --subscription ${{ env.subscriptionId}}
+
+        - name: create landingzone
+          uses: azure/cli@v1
+          with:
+              inlineScript: |
+                params=$(jq -c . < ${{ inputs.parameterFile }})
+                echo "JSON content: $params"
+                
+                deployment=$(az stack mg create \
+                --name "lz-${{ env.subscriptionName }}" \
+                --management-group-id ${{ env.managementGroup }} \
+                --location ${{ inputs.location }} \
+                --template-file ${{ inputs.landingzoneMainBicep }} \
+                --parameters params=$params \
+                --deny-settings-mode None \
+                --action-on-unmanage deleteAll \
+                --yes)
+
+                readOutputs=$(echo $deployment | jq '.outputs')
+                echo "Deployment Outputs: $readOutputs"
+                keyValuePairs=$(echo $readOutputs | jq -r 'to_entries[] | "\(.key)=\(.value.value)"')
+                IFS=$'\n'
+                for output in $keyValuePairs
+                do
+                  echo $output
+                  echo "$output" >> $GITHUB_ENV
+                done

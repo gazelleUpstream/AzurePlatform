@@ -1,0 +1,83 @@
+name: template - Identity
+
+on:
+  workflow_call:
+    inputs:
+        environment:
+            required: true
+            type: string
+        mainBicep:
+            default: ./Identity/bicep/main-identity.bicep
+            type: string
+
+jobs:
+    Identity:
+        runs-on: ubuntu-latest
+        environment: ${{ inputs.environment }}-Identity
+        steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: get github token
+          id: github-token
+          uses: actions/create-github-app-token@v1
+          with:
+            app-id: ${{ vars.APP_GITHUB_BIGBANG_ID }}
+            private-key: ${{ secrets.APP_GITHUB_BIGBANG }}
+
+        - name: Azure login
+          uses: azure/login@v1
+          with:
+            client-id: ${{ vars.AZUREIDENTITY_CLIENT_ID }}
+            tenant-id: ${{ vars.AZURE_TENANT_ID}}
+            allow-no-subscriptions: true
+            enable-AzPSSession: false
+
+        - name: AzureIdentity RBAC
+          uses: azure/cli@v1
+          with:
+            inlineScript: |
+               az role assignment create --assignee ${{ vars.AZUREIDENTITY_CLIENT_ID }} \
+               --role "Contributor" \
+               --scope /subscriptions/${{ vars.MANAGEMENT_SUBSCRIPTION_ID }}
+
+        - name: config UserAssignedIdentity
+          id: azureIdentity
+          uses: azure/cli@v1
+          with:
+            inlineScript: |
+              az account set --subscription ${{ vars.MANAGEMENT_SUBSCRIPTION_ID }}
+
+              deployment=$(az stack sub create \
+                --name identity-${{ inputs.environment}} \
+                --location ${{ vars.AZURE_DEFAULT_LOCATION }} \
+                --template-file ${{ inputs.mainBicep }} \
+                --parameters environment=${{ inputs.environment }} \
+                --parameters location=${{  vars.AZURE_DEFAULT_LOCATION }} \
+                --deny-settings-mode None \
+                --action-on-unmanage deleteAll \
+                --yes)
+
+              readOutputs=$(echo $deployment | jq '.outputs')
+              echo "Deployment Outputs: $readOutputs"
+              keyValuePairs=$(echo $readOutputs | jq -r 'to_entries[] | "\(.key)=\(.value.value)"')
+              IFS=$'\n'
+              for output in $keyValuePairs
+              do
+                echo $output
+                echo "$output" >> $GITHUB_ENV
+              done
+
+        - name: set env variables
+          env:
+            GH_TOKEN: ${{ steps.github-token.outputs.token }}
+          run: |
+              gh variable set Policy_client_Id \
+              --body ${{ env.policyClientId }} \
+              --env ${{ inputs.environment}}-Policy \
+              -R gazelle-cloud/AzurePlatform
+           
+              gh variable set Landingzone_client_Id \
+              --body ${{ env.landingzoneClientId }} \
+              -R gazelle-cloud/AzurePlatform
+

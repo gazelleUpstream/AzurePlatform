@@ -1,0 +1,78 @@
+name: template - request new landingzone
+
+on:
+  issues: 
+    types: closed
+
+jobs:
+  build:
+    if: contains(github.event.issue.labels.*.name, 'newLandingzone')
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - uses: actions/checkout@v4
+        
+      - name: get issue inputs
+        id: inputs
+        uses: edumserrano/github-issue-forms-parser@v1
+        with:
+          template-filepath: '.github/ISSUE_TEMPLATE/request-new-landingzone.yml'
+          issue-form-body: '${{ github.event.issue.body }}'
+
+      - name: Output parsed issue
+        id: json
+        shell: pwsh
+        run: |
+          $issue = '${{ steps.inputs.outputs.parsed-issue }}' | ConvertFrom-Json
+          $issueAsJsonIndented = ConvertTo-Json $issue
+          Write-Output $issueAsJsonIndented
+          $location = $issue.location
+          $mgmtGroupName = $issue.managementGroupName.Split("-")[0]
+          $mgmtGroupSuffix = $issue.managementGroupName.Split("-")[1]
+          $fileName = "{0}-{1}-{2}" -f $mgmtGroupName, $issue.labName, $issue.environment
+          set-content -path "parameters/$fileName.json" -value $issueAsJsonIndented
+          write-output "landingzoneName=$fileName" >> $env:GITHUB_ENV
+          write-output "landingzoneLocation=$location" >> $env:GITHUB_ENV
+          write-output "managementGroupSuffix=$mgmtGroupSuffix" >> $env:GITHUB_ENV
+          write-output "managementGroupName=$mgmtGroupName" >> $env:GITHUB_ENV
+        
+      - name: init workflow file
+        run: |
+          cp .github/workflows/template-newLandingzone.yml .github/workflows/${{ env.landingzoneName }}.yml
+
+      - name: replace - landingzoneName
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "replaceMe-lz-landingzoneName"
+          replace: "${{ env.landingzoneName }}"
+          exclude: "**/template-*"
+
+      - name: replace - location
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "replaceMe-location"
+          replace: "${{ env.landingzoneLocation }}"
+          exclude: "**/template-*"
+   
+      - name: replace - managementGroupName
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "replaceMe-lz-managementGroupName"
+          replace: "${{ env.managementGroupName }}"
+          exclude: "**/template-*"
+
+      - name: replace - managementGroupSuffix
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "replaceMe-lz-managementGroupSuffix"
+          replace: "${{ env.managementGroupSuffix }}"
+          exclude: "**/template-*"
+
+      - name: push param file
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "init landingzone: ${{ env.landingzoneName }}"
+          git push
+      

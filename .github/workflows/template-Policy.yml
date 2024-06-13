@@ -1,0 +1,32 @@
+name: template - Policy
+
+on:
+  workflow_call:
+    inputs:
+        environment:
+            required: true
+            type: string
+
+jobs:
+    Policy:
+        runs-on: ubuntu-latest
+        environment: ${{ inputs.environment }}-Policy
+        steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: get github token
+          id: github-token
+          uses: actions/create-github-app-token@v1
+          with:
+            app-id: ${{ vars.APP_GITHUB_BIGBANG_ID }}
+            private-key: ${{ secrets.APP_GITHUB_BIGBANG }}
+
+        - name: Azure login
+          uses: azure/login@v1
+          with:
+            client-id: ${{ vars.POLICY_CLIENT_ID }}
+            tenant-id: ${{ vars.AZURE_TENANT_ID}}
+            allow-no-subscriptions: true
+            enable-AzPSSession: false
+
