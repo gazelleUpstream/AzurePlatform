@@ -1,4 +1,4 @@
-name: bigBang
+name: az - BigBang
 
 on:
   push:

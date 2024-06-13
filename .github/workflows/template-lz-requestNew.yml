@@ -23,14 +23,18 @@ jobs:
         id: json
         shell: pwsh
         run: |
+          ls 
           $issue = '${{ steps.inputs.outputs.parsed-issue }}' | ConvertFrom-Json
           $issueAsJsonIndented = ConvertTo-Json $issue
+
           Write-Output $issueAsJsonIndented
           $location = $issue.location
           $mgmtGroupName = $issue.managementGroupName.Split("-")[0]
           $mgmtGroupSuffix = $issue.managementGroupName.Split("-")[1]
+
           $fileName = "{0}-{1}-{2}" -f $mgmtGroupName, $issue.labName, $issue.environment
           set-content -path "Landingzone/parameters/$fileName.json" -value $issueAsJsonIndented
+          
           write-output "landingzoneName=$fileName" >> $env:GITHUB_ENV
           write-output "landingzoneLocation=$location" >> $env:GITHUB_ENV
           write-output "managementGroupSuffix=$mgmtGroupSuffix" >> $env:GITHUB_ENV
