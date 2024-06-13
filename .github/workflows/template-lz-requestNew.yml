@@ -42,7 +42,7 @@ jobs:
         
       - name: init workflow file
         run: |
-          cp .github/workflows/template-newLandingzone.yml .github/workflows/${{ env.landingzoneName }}.yml
+          cp .github/workflows/template-lz-replace.yml .github/workflows/${{ env.landingzoneName }}.yml
 
       - name: replace - landingzoneName
         uses: jacobtomlinson/gha-find-replace@v3
