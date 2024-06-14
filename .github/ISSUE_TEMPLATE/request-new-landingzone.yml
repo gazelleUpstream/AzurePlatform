@@ -22,7 +22,7 @@ body:
       multiple: false
       description:
       options: 
-        - tst
+        - test
         - dev
         - uat
         - prod
@@ -37,12 +37,9 @@ body:
       multiple: false
       description:
       options: 
-        - landingzones-prod
+        - online-prod
         - platform-prod
         - playground-prod
-        - landingzones-test
-        - platform-test
-        - playground-test
       default: 0
     validations:
       required: true
@@ -55,7 +52,6 @@ body:
       multiple: false
       options:
       - FranceCentral
-      - SwitzerlandNorth
       default: 0
     validations:
       required: true

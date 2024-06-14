@@ -54,7 +54,7 @@ jobs:
                 
                 deployment=$(az deployment mg create \
                 --name generateInputs \
-                --management-group-id gazelle-test \
+                --management-group-id gazelle-prod \
                 --location ${{ vars.AZURE_DEFAULT_LOCATION }} \
                 --template-file ${{ inputs.deploymentInputsMainBicep }} \
                 --parameters params=$params)
@@ -90,9 +90,9 @@ jobs:
                 
                 deployment=$(az stack mg create \
                 --name "lz-${{ env.subscriptionName }}" \
-                --management-group-id ${{ env.managementGroup }} \
+                --management-group-id ${{ env.managementGroupName }} \
                 --location ${{ inputs.location }} \
-                --template-file ${{ inputs.landingzoneMainBicep }} \
+                --template-file ${{ inputs.mainBicep }} \
                 --parameters params=$params \
                 --deny-settings-mode None \
                 --action-on-unmanage deleteAll \
