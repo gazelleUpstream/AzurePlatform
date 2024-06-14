@@ -37,22 +37,9 @@ body:
       multiple: false
       description:
       options: 
-        - online-prod
-        - platform-prod
-        - playground-prod
-      default: 0
-    validations:
-      required: true
-
-  - type: dropdown
-    id: managementGroupHierarchy
-    attributes:
-      label: management group hierarchy
-      multiple: false
-      description:
-      options: 
-        - prod
-        - test
+        - online
+        - platform
+        - playground
       default: 0
     validations:
       required: true
