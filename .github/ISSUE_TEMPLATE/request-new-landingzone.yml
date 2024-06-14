@@ -45,6 +45,19 @@ body:
       required: true
 
   - type: dropdown
+    id: managementGroupHierarchy
+    attributes:
+      label: management group hierarchy
+      multiple: false
+      description:
+      options: 
+        - prod
+        - test
+      default: 0
+    validations:
+      required: true
+
+  - type: dropdown
     id: location
     attributes:
       label: location
