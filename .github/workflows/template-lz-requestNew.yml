@@ -56,7 +56,7 @@ jobs:
       - name: replace - location
         uses: jacobtomlinson/gha-find-replace@v3
         with:
-          find: "replaceMe-location"
+          find: "replaceMe-lz-location"
           replace: "${{ env.landingzoneLocation }}"
           exclude: "**/template-*"
    
