@@ -9,7 +9,7 @@ env:
 
 jobs:
   initLandingzone:
-    if: contains(github.event.issue.labels.*.name, 'newLandingzone' )
+    if: contains(github.event.issue.labels.*.name, 'newLandingzone') || contains(github.event.issue.labels.*.name, 'newLandingzoneTest')
     runs-on: ubuntu-latest
     environment: ${{ contains(github.event.issue.labels.*.name, 'newLandingzoneTest') && 'test' || 'prod' }}-LandingZone
     steps:
@@ -33,12 +33,12 @@ jobs:
 
           Write-Output $issueAsJsonIndented
 
-          $fileName = "{0}-{1}-{2}" -f $issue.mgmtGroupName, $issue.labName, $issue.environment
+          $fileName = "{0}-{1}-{2}" -f $issue.managementGroupName, $issue.labName, $issue.environment
           set-content -path "Landingzone/$fileName.json" -value $issueAsJsonIndented
           
           write-output "landingzoneName=$fileName" >> $env:GITHUB_ENV
           write-output "landingzoneLocation=$issue.location" >> $env:GITHUB_ENV
-          write-output "managementGroupName=$issue.mgmtGroupName" >> $env:GITHUB_ENV
+          write-output "managementGroupName=$issue.managementGroupName" >> $env:GITHUB_ENV
           write-output "managementGroupSuffix=${{ env.environmentSuffix }}" >> $env:GITHUB_ENV
         
       - name: init workflow file
