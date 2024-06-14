@@ -55,7 +55,7 @@ jobs:
                 deployment=$(az deployment mg create \
                 --name generateInputs \
                 --management-group-id gazelle-tst \
-                --location ${{ vars.location }} \
+                --location ${{ vars.AZURE_DEFAULT_LOCATION }} \
                 --template-file ${{ inputs.deploymentInputsMainBicep }} \
                 --parameters params=$params)
 
