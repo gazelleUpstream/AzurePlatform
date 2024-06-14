@@ -4,11 +4,14 @@ on:
   issues: 
     types: closed
 
+env:
+  environmentSuffix: ${{ contains(github.event.issue.labels.*.name, 'newLandingzoneTest') && 'test' || 'prod' }}
+
 jobs:
   initLandingzone:
-    if: contains(github.event.issue.labels.*.name, 'newLandingzone')
+    if: contains(github.event.issue.labels.*.name, 'newLandingzone' )
     runs-on: ubuntu-latest
-    permissions: write-all
+    environment: ${{ contains(github.event.issue.labels.*.name, 'newLandingzoneTest') && 'test' || 'prod' }}-LandingZone
     steps:
       - uses: actions/checkout@v4
         with:
@@ -25,22 +28,18 @@ jobs:
         id: json
         shell: pwsh
         run: |
-          ls 
           $issue = '${{ steps.inputs.outputs.parsed-issue }}' | ConvertFrom-Json
           $issueAsJsonIndented = ConvertTo-Json $issue
 
           Write-Output $issueAsJsonIndented
-          $location = $issue.location
-          $mgmtGroupName = $issue.managementGroupName.Split("-")[0]
-          $mgmtGroupSuffix = $issue.managementGroupName.Split("-")[1]
 
-          $fileName = "{0}-{1}-{2}" -f $mgmtGroupName, $issue.labName, $issue.environment
+          $fileName = "{0}-{1}-{2}" -f $issue.mgmtGroupName, $issue.labName, $issue.environment
           set-content -path "Landingzone/$fileName.json" -value $issueAsJsonIndented
           
           write-output "landingzoneName=$fileName" >> $env:GITHUB_ENV
-          write-output "landingzoneLocation=$location" >> $env:GITHUB_ENV
-          write-output "managementGroupSuffix=$mgmtGroupSuffix" >> $env:GITHUB_ENV
+          write-output "landingzoneLocation=$issue.location" >> $env:GITHUB_ENV
           write-output "managementGroupName=$mgmtGroupName" >> $env:GITHUB_ENV
+          write-output "managementGroupSuffix=${{ env.environmentSuffix }}" >> $env:GITHUB_ENV
         
       - name: init workflow file
         run: |
@@ -71,7 +70,7 @@ jobs:
         uses: jacobtomlinson/gha-find-replace@v3
         with:
           find: "replaceMe-lz-managementGroupSuffix"
-          replace: "${{ env.managementGroupSuffix }}"
+          replace: "${{ env.environmentSuffix }}"
           exclude: "**/template-*"
 
       - name: push param file
