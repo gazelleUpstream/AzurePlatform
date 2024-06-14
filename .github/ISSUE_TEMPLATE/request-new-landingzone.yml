@@ -40,9 +40,9 @@ body:
         - landingzones-prod
         - platform-prod
         - playground-prod
-        - landingzones-tst
-        - platform-tst
-        - playground-tst
+        - landingzones-test
+        - platform-test
+        - playground-test
       default: 0
     validations:
       required: true
