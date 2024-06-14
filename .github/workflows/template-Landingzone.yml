@@ -78,7 +78,7 @@ jobs:
                   --name ${{ env.subscriptionName }}
 
                 az account management-group subscription add \
-                  --name ${{ env.managementGroup }} \
+                  --name ${{ env.managementGroupName }} \
                   --subscription ${{ env.subscriptionId}}
 
         - name: create landingzone
