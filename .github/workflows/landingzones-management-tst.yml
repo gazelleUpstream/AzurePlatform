@@ -1,0 +1,23 @@
+
+name: lz - landingzones-management-tst
+
+on:
+  push:
+    paths:
+      - 'Landingzone/landingzones-management-tst.json'
+
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  landingzone:
+    uses: ./.github/workflows/template-Landingzone.yml
+    with:
+      managementGroupName : landingzones
+      managementGroupSuffix: test
+      location: replaceMe-lz-location
+      parameterFile: ./Landingzone/landingzones-management-tst.json
+    secrets: inherit
