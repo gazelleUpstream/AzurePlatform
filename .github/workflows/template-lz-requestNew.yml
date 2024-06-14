@@ -38,7 +38,7 @@ jobs:
           
           write-output "landingzoneName=$fileName" >> $env:GITHUB_ENV
           write-output "landingzoneLocation=$issue.location" >> $env:GITHUB_ENV
-          write-output "managementGroupName=$mgmtGroupName" >> $env:GITHUB_ENV
+          write-output "managementGroupName=$issue.mgmtGroupName" >> $env:GITHUB_ENV
           write-output "managementGroupSuffix=${{ env.environmentSuffix }}" >> $env:GITHUB_ENV
         
       - name: init workflow file
