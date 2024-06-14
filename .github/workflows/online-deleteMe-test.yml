@@ -1,0 +1,23 @@
+
+name: lz - online-deleteMe-test
+
+on:
+  push:
+    paths:
+      - 'Landingzone/online-deleteMe-test.json'
+
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  landingzone:
+    uses: ./.github/workflows/template-Landingzone.yml
+    with:
+      managementGroupName : @{labName=deleteMe; environment=test; managementGroupName=online; location=FranceCentral; subscriptionId=b8c40569-76e6-46fc-bcf5-8bfb802c56ac; budget=10; githubOrganizationName=gazelle-cloud; githubRepoName=online; ownerEmail=foo@gazelle.cloud; engineer=bar@gazelle.cloud}.managementGroupName
+      managementGroupSuffix: test
+      location: @{labName=deleteMe; environment=test; managementGroupName=online; location=FranceCentral; subscriptionId=b8c40569-76e6-46fc-bcf5-8bfb802c56ac; budget=10; githubOrganizationName=gazelle-cloud; githubRepoName=online; ownerEmail=foo@gazelle.cloud; engineer=bar@gazelle.cloud}.location
+      parameterFile: ./Landingzone/online-deleteMe-test.json
+    secrets: inherit
