@@ -1,0 +1,23 @@
+
+name: lz - platform-management-prod
+
+on:
+  push:
+    paths:
+      - 'Landingzone/platform-management-prod.json'
+
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  landingzone:
+    uses: ./.github/workflows/template-Landingzone.yml
+    with:
+      managementGroupName : platform
+      managementGroupSuffix: prod
+      location: FranceCentral
+      parameterFile: ./Landingzone/platform-management-prod.json
+    secrets: inherit
