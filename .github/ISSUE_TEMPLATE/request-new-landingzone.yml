@@ -37,9 +37,9 @@ body:
       multiple: false
       description:
       options: 
-        - online
-        - platform
-        - playground
+        - online-prod
+        - platform-prod
+        - playground-prod
       default: 0
     validations:
       required: true
