@@ -82,6 +82,8 @@ jobs:
           exclude: "**/template-*"
 
       - name: push param file
+        env:
+          GH_TOKEN: ${{ steps.github-token.outputs.token }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
