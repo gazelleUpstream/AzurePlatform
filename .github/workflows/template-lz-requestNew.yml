@@ -14,8 +14,8 @@ jobs:
         id: github-token
         uses: actions/create-github-app-token@v1
         with:
-          app-id: ${{ vars.APP_GITHUB_BIGBANG_ID }}
-          private-key: ${{ secrets.APP_GITHUB_BIGBANG }}
+          app-id: ${{ vars.APP_GITHUB_NEWLANDINGZONE_ID }}
+          private-key: ${{ secrets.APP_GITHUB_NEWLANDINGZONE }}
       
       - uses: actions/checkout@v4
         with:

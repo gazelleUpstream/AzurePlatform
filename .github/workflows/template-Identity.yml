@@ -79,5 +79,6 @@ jobs:
            
               gh variable set Landingzone_client_Id \
               --body ${{ env.landingzoneClientId }} \
+              --env ${{ inputs.environment}}-Landingzone \
               -R gazelle-cloud/AzurePlatform
 

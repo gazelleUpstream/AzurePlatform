@@ -3,6 +3,9 @@ name: template - Langingzone
 on:
   workflow_call:
     inputs:
+        environment:
+          default: prod
+          type: string
         managementGroupName:
           required: true
           type: string
@@ -26,6 +29,7 @@ on:
 jobs:
     Langingzone:
         runs-on: ubuntu-latest
+        environment: ${{ inputs.environment }}-Landingzone
         steps:
         - name: Checkout
           uses: actions/checkout@v4

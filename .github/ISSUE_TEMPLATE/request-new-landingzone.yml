@@ -40,6 +40,9 @@ body:
         - online-prod
         - platform-prod
         - playground-prod
+        - online-test
+        - platform-test
+        - playground-test
       default: 0
     validations:
       required: true
