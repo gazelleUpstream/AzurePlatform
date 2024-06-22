@@ -10,10 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
-      - uses: actions/checkout@v4
-        with:
-          token: ${{ steps.github-token.outputs.token }}
-           
       - name: get github token
         id: github-token
         uses: actions/create-github-app-token@v1
@@ -21,6 +17,9 @@ jobs:
           app-id: ${{ vars.APP_GITHUB_NEWLANDINGZONE_ID }}
           private-key: ${{ secrets.APP_GITHUB_NEWLANDINGZONE }}
       
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ steps.github-token.outputs.token }}      
 
       - name: get issue inputs
         id: inputs
