@@ -1,4 +1,4 @@
-name: az - BigBang
+name: az - managementGroups
 
 on:
   push:
@@ -25,7 +25,7 @@ jobs:
   test:
     if: (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main') || 
         github.ref != 'refs/heads/main'
-    uses: ./.github/workflows/template-BigBang.yml
+    uses: ./.github/workflows/template-managementGroups.yml
     with:
       environment: test
     secrets: inherit
@@ -33,7 +33,7 @@ jobs:
   prod:
     if: (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
          github.event.pull_request.merged == true
-    uses: ./.github/workflows/template-BigBang.yml
+    uses: ./.github/workflows/template-managementGroups.yml
     with:
       environment: prod
     secrets: inherit

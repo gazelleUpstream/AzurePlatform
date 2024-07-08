@@ -4,16 +4,16 @@ on:
   workflow_call:
     inputs:
         environment:
-            required: true
-            type: string
+          required: true
+          type: string
         mainBicep:
-            default: ./Identity/bicep/main-identity.bicep
-            type: string
+          default: ./Identity/bicep/AzureIdentity.bicep
+          type: string
 
 jobs:
     Identity:
         runs-on: ubuntu-latest
-        environment: ${{ inputs.environment }}-Identity
+        environment: ${{ inputs.environment }}-BigBang
         steps:
         - name: Checkout
           uses: actions/checkout@v4
@@ -28,57 +28,51 @@ jobs:
         - name: Azure login
           uses: azure/login@v1
           with:
-            client-id: ${{ vars.AZUREIDENTITY_CLIENT_ID }}
+            client-id: ${{ vars.APP_AZURE_BIGBANG_CLIENT_ID }}
             tenant-id: ${{ vars.AZURE_TENANT_ID}}
             allow-no-subscriptions: true
             enable-AzPSSession: false
 
-        - name: AzureIdentity RBAC
-          uses: azure/cli@v1
-          with:
-            inlineScript: |
-               az role assignment create --assignee ${{ vars.AZUREIDENTITY_CLIENT_ID }} \
-               --role "Contributor" \
-               --scope /subscriptions/${{ vars.MANAGEMENT_SUBSCRIPTION_ID }}
-
-        - name: config UserAssignedIdentity
+        - name: AzureIdentity
           id: azureIdentity
           uses: azure/cli@v1
           with:
             inlineScript: |
               az account set --subscription ${{ vars.MANAGEMENT_SUBSCRIPTION_ID }}
 
-              deployment=$(az stack sub create \
-                --name identity-${{ inputs.environment}} \
+              deployment=$(az stack mg create \
+                --name AzureIdentity-${{ inputs.environment}} \
                 --location ${{ vars.AZURE_DEFAULT_LOCATION }} \
+                --management-group-id ${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \
                 --template-file ${{ inputs.mainBicep }} \
+                --parameters './Identity/parameters/AzureIdentity.bicepparam' \
+                --parameters subscriptionId=${{ vars.MANAGEMENT_SUBSCRIPTION_ID }} \
                 --parameters environment=${{ inputs.environment }} \
                 --parameters location=${{  vars.AZURE_DEFAULT_LOCATION }} \
                 --deny-settings-mode None \
                 --action-on-unmanage deleteAll \
                 --yes)
 
-              readOutputs=$(echo $deployment | jq '.outputs')
-              echo "Deployment Outputs: $readOutputs"
-              keyValuePairs=$(echo $readOutputs | jq -r 'to_entries[] | "\(.key)=\(.value.value)"')
-              IFS=$'\n'
-              for output in $keyValuePairs
-              do
-                echo $output
-                echo "$output" >> $GITHUB_ENV
-              done
-
+              envVariables=$(echo $deployment | jq '.outputs.gitHubEnviromentVariables.value')
+              echo "Deployment Outputs: $envVariables"
+              echo "AzureIdentity=$(echo $envVariables | jq -c .)" >> $GITHUB_ENV
+         
         - name: set env variables
           env:
             GH_TOKEN: ${{ steps.github-token.outputs.token }}
           run: |
-              gh variable set Policy_client_Id \
-              --body ${{ env.policyClientId }} \
-              --env ${{ inputs.environment}}-Policy \
-              -R gazelle-cloud/AzurePlatform
-           
-              gh variable set Landingzone_client_Id \
-              --body ${{ env.landingzoneClientId }} \
-              --env ${{ inputs.environment}}-Landingzone \
-              -R gazelle-cloud/AzurePlatform
-
+              deploymentOutputs=$(echo $AzureIdentity | jq .)
+              echo "Deployment Outputs: $deploymentOutputs"
+              
+              objects=$(echo $deploymentOutputs | jq -c '.[]')
+              for obj in $objects; do
+                keys=$(echo $obj | jq -r 'keys[]')
+                for key in $keys; do
+                  value=$(echo $obj | jq --arg k "$key" -r '.[$k]')
+                  # Use gh variable set command to set the environment variable
+                  gh variable set $key \
+                    --body "$value" \
+                    --env "${{ inputs.environment }}-management" \
+                    -R gazelle-cloud/AzurePlatform
+                done
+              done
