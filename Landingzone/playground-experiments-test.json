@@ -3,7 +3,6 @@
   "environment": "test",
   "managementGroupName": "playground-prod",
   "location": "FranceCentral",
-  "subscriptionId": "b8c40569-76e6-46fc-bcf5-8bfb802c56ac",
   "budget": "10",
   "githubOrganizationName": "gazelle-cloud",
   "githubRepoName": "experiments",

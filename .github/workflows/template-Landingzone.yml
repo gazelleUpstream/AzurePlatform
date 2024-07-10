@@ -73,17 +73,6 @@ jobs:
                   echo "$output" >> $GITHUB_ENV
                 done
 
-        # - name: rename subscription
-        #   uses: azure/cli@v1
-        #   with:
-        #       inlineScript: |
-        #         az account subscription rename  \
-        #           --id ${{ env.resourceId }} \
-        #           --name ${{ env.subscriptionName }}
-
-        #         az account management-group subscription add \
-        #           --name ${{ env.managementGroupName }} \
-        #           --subscription ${{ env.resourceId}}
 
         - name: create subscription
           uses: azure/cli@v1
@@ -122,6 +111,7 @@ jobs:
                 --management-group-id ${{ env.managementGroupName }} \
                 --location ${{ inputs.location }} \
                 --template-file ${{ inputs.mainBicep }} \
+                --parameters subscriptionId=${{ env.subscriptionId }} \
                 --parameters params=$params \
                 --deny-settings-mode None \
                 --action-on-unmanage deleteAll \

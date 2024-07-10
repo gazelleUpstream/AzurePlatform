@@ -16,3 +16,4 @@ resource createSubscription 'Microsoft.Subscription/aliases@2021-10-01' = {
 
 output resourceName string = createSubscription.name
 output resourceId string = createSubscription.id
+output subscriptionId string = createSubscription.properties.subscriptionId
