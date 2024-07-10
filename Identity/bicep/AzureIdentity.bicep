@@ -32,21 +32,21 @@ module managedIdentity 'modules/uami.bicep' = [
   }
 ]
 
-module rbac 'modules/roleAssignment.bicep' = [
-  for (item, i) in items(identity): if (item.value.rbac.scope != '') {
-    scope: managementGroup(item.value.rbac.scope)
-    name: 'role-${item.key}'
-    params: {
-      principlesId: managedIdentity[i].outputs.principalId
-      roleDefinitions: item.value.rbac.roleDefinitions
-    }
-  }
-]
+// module rbac 'modules/roleAssignment.bicep' = [
+//   for (item, i) in items(identity): if (item.value.rbac.scope != '') {
+//     scope: managementGroup(item.value.rbac.scope)
+//     name: 'role-${item.key}'
+//     params: {
+//       principlesId: managedIdentity[i].outputs.principalId
+//       roleDefinitions: item.value.rbac.roleDefinitions
+//     }
+//   }
+// ]
 
 output gitHubEnviromentVariables array = [
   for (item, i) in items(identity): {
-    '${item.key}PrincipalId': managedIdentity[i].outputs.principalId
-    '${item.key}ResourceId': managedIdentity[i].outputs.resourceId
-    '${item.key}ClientId': managedIdentity[i].outputs.clientId
+    '${item.key}_Principal_Id': managedIdentity[i].outputs.principalId
+    '${item.key}_Resource_Id': managedIdentity[i].outputs.resourceId
+    '${item.key}_Client_Id': managedIdentity[i].outputs.clientId
   }
 ]

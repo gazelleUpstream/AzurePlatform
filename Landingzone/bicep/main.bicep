@@ -12,7 +12,6 @@ var resourceTags = {
   environment: params.environment
 }
 
-
 module identity 'modules/identity.bicep' = {
   name: 'lz-identity'
   scope: subscription(params.subscriptionId)

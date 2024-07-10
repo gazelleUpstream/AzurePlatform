@@ -29,7 +29,7 @@ on:
 jobs:
     Langingzone:
         runs-on: ubuntu-latest
-        environment: ${{ inputs.environment }}-Landingzone
+        environment: ${{ inputs.environment }}-azurePlatform
         steps:
         - name: Checkout
           uses: actions/checkout@v4
@@ -44,7 +44,7 @@ jobs:
         - name: Azure login
           uses: azure/login@v1
           with:
-            client-id: ${{ vars.LANDINGZONE_CLIENT_ID }}
+            client-id: ${{ vars.APP_AZURE_PLATFORM_CLIENT_ID }}
             tenant-id: ${{ vars.AZURE_TENANT_ID}}
             allow-no-subscriptions: true
             enable-AzPSSession: false
@@ -73,17 +73,42 @@ jobs:
                   echo "$output" >> $GITHUB_ENV
                 done
 
-        - name: rename subscription
+        # - name: rename subscription
+        #   uses: azure/cli@v1
+        #   with:
+        #       inlineScript: |
+        #         az account subscription rename  \
+        #           --id ${{ env.resourceId }} \
+        #           --name ${{ env.subscriptionName }}
+
+        #         az account management-group subscription add \
+        #           --name ${{ env.managementGroupName }} \
+        #           --subscription ${{ env.resourceId}}
+
+        - name: create subscription
           uses: azure/cli@v1
           with:
               inlineScript: |
-                az account subscription rename  \
-                  --id ${{ env.subscriptionId }} \
-                  --name ${{ env.subscriptionName }}
+                params=$(jq -c . < ${{ inputs.parameterFile }})
+                echo "JSON content: $params"
+                
+                deployment=$(az deployment mg create \
+                --name "lz-${{ env.subscriptionName }}" \
+                --management-group-id ${{ env.managementGroupName }} \
+                --location ${{ inputs.location }} \
+                --template-file './Landingzone/bicep/modules/aliases.bicep' \
+                --parameters subscriptionName=${{ env.subscriptionName }} \
+                --parameters billingScope=${{  secrets.BILLINGPROFILES_PLATFORM }})
 
-                az account management-group subscription add \
-                  --name ${{ env.managementGroupName }} \
-                  --subscription ${{ env.subscriptionId}}
+                readOutputs=$(echo $deployment | jq '.outputs')
+                echo "Deployment Outputs: $readOutputs"
+                keyValuePairs=$(echo $readOutputs | jq -r 'to_entries[] | "\(.key)=\(.value.value)"')
+                IFS=$'\n'
+                for output in $keyValuePairs
+                do
+                  echo $output
+                  echo "$output" >> $GITHUB_ENV
+                done
 
         - name: create landingzone
           uses: azure/cli@v1

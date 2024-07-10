@@ -5,15 +5,15 @@ on:
     branches-ignore:
       - main
     paths:
-        - 'BigBang/**'
-        - '.github/workflows/template-BigBang.yml'
-        - '.github/workflows/main-BigBang.yml'
+        - 'managementGroups/**'
+        - '.github/workflows/template-managementGroups.yml'
+        - '.github/workflows/main-managementGroups.yml'
 
   pull_request_target:
     types:
       - closed
     paths:
-      - 'BigBang/**'
+      - 'managementGroups/**'
   
   workflow_dispatch:
 

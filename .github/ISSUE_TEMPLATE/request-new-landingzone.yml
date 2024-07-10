@@ -59,14 +59,14 @@ body:
     validations:
       required: true
 
-  - type: input
-    id: subscriptionId
-    attributes:
-      label: subscription Id
-      description: 
-      placeholder: 84e64f94-714d-4c07-9f03-f07af8380b36
-    validations:
-      required: true
+  # - type: input
+  #   id: subscriptionId
+  #   attributes:
+  #     label: subscription Id
+  #     description: 
+  #     placeholder: 84e64f94-714d-4c07-9f03-f07af8380b36
+  #   validations:
+  #     required: true
 
   - type: input
     id: budget

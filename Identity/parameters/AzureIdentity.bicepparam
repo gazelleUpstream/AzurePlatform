@@ -7,12 +7,6 @@ param subscriptionId = ''
 param identity = {
   policy: {
     federatedCredentials: {}
-    RBAC: {
-      scope: 'gazelle-test'
-      roleDefinitions: [
-        '/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
-      ]
-    }
   }
   // landingzone: {
   //   federatedCredentials: {
