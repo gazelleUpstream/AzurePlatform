@@ -100,7 +100,7 @@ jobs:
                 --parameters subscriptionName=${{ env.subscriptionName }} \
                 --parameters billingScope=${{  secrets.BILLINGPROFILES_PLATFORM }})
 
-                readOutputs=$(echo $deployment | jq '.outputs')
+                readOutputs=$(echo $deployment | jq '.properties.outputs')
                 echo "Deployment Outputs: $readOutputs"
                 keyValuePairs=$(echo $readOutputs | jq -r 'to_entries[] | "\(.key)=\(.value.value)"')
                 IFS=$'\n'
