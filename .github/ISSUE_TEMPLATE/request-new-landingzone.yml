@@ -38,11 +38,8 @@ body:
       description:
       options: 
         - online-prod
-        - platform-prod
         - playground-prod
-        - online-test
-        - platform-test
-        - playground-test
+        - platform-prod
       default: 0
     validations:
       required: true
@@ -58,15 +55,6 @@ body:
       default: 0
     validations:
       required: true
-
-  # - type: input
-  #   id: subscriptionId
-  #   attributes:
-  #     label: subscription Id
-  #     description: 
-  #     placeholder: 84e64f94-714d-4c07-9f03-f07af8380b36
-  #   validations:
-  #     required: true
 
   - type: input
     id: budget

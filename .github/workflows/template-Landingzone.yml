@@ -49,30 +49,17 @@ jobs:
             allow-no-subscriptions: true
             enable-AzPSSession: false
 
-        - name: generate inputs
+        - name: fetch JSON values
           uses: azure/cli@v1
           with:
-              inlineScript: |
-                params=$(jq -c . < ${{ inputs.parameterFile }})
-                echo "JSON content: $params"
-                
-                deployment=$(az deployment mg create \
-                --name generateInputs \
-                --management-group-id gazelle-prod \
-                --location ${{ vars.AZURE_DEFAULT_LOCATION }} \
-                --template-file ${{ inputs.deploymentInputsMainBicep }} \
-                --parameters params=$params)
-
-                deploymentInputs=$(echo $deployment | jq '.properties.outputs')
-                echo "Deployment Outputs: $deploymentInputs"
-                keyValuePairs=$(echo $deploymentInputs | jq -r 'to_entries[] | "\(.key)=\(.value.value)"')
+            inlineScript: |
+                params=$(jq -r 'to_entries[] | "\(.key)=\(.value)"' ${{ inputs.parameterFile }})
                 IFS=$'\n'
-                for output in $keyValuePairs
+                for item in $params
                 do
-                  echo $output
-                  echo "$output" >> $GITHUB_ENV
-                done
-
+                  echo $item
+                  echo "$item" >> $GITHUB_ENV
+                done  
 
         - name: create subscription
           uses: azure/cli@v1
@@ -82,11 +69,11 @@ jobs:
                 echo "JSON content: $params"
                 
                 deployment=$(az deployment mg create \
-                --name "lz-${{ env.subscriptionName }}" \
+                --name "lz-${{ env.labName }}-${{ env.environment}}" \
                 --management-group-id ${{ env.managementGroupName }} \
                 --location ${{ inputs.location }} \
                 --template-file './Landingzone/bicep/modules/aliases.bicep' \
-                --parameters subscriptionName=${{ env.subscriptionName }} \
+                --parameters subscriptionName="${{ env.labName }}-${{ env.environment}}" \
                 --parameters billingScope=${{  secrets.BILLINGPROFILES_PLATFORM }})
 
                 readOutputs=$(echo $deployment | jq '.properties.outputs')
