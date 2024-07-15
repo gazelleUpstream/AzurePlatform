@@ -60,6 +60,10 @@ jobs:
                   echo $item
                   echo "$item" >> $GITHUB_ENV
                 done  
+        
+        - name: manipulate values
+          run: |
+            echo "mgmtPreffix=$(echo ${{ env.managementGroupName }} | cut -d'-' -f1)" >> $GITHUB_ENV
 
         - name: create subscription
           uses: azure/cli@v1
@@ -69,7 +73,7 @@ jobs:
                 echo "JSON content: $params"
                 
                 deployment=$(az deployment mg create \
-                --name "lz-${{ env.labName }}-${{ env.environment}}" \
+                --name "lz-${{ env.mgmtPreffix }}-${{ env.labName }}-${{ env.environment}}" \
                 --management-group-id ${{ env.managementGroupName }} \
                 --location ${{ inputs.location }} \
                 --template-file './Landingzone/bicep/modules/aliases.bicep' \
@@ -86,6 +90,14 @@ jobs:
                   echo "$output" >> $GITHUB_ENV
                 done
 
+        - name: move subscription
+          uses: azure/cli@v1
+          with:
+              inlineScript: |
+                az account management-group subscription add \
+                  --name ${{ env.managementGroupName }} \
+                  --subscription ${{ env.subscriptionId}}
+
         - name: create landingzone
           uses: azure/cli@v1
           with:
@@ -94,7 +106,7 @@ jobs:
                 echo "JSON content: $params"
                 
                 deployment=$(az stack mg create \
-                --name "lz-${{ env.subscriptionName }}" \
+                --name "lz-${{ env.labName }}-${{ env.environment}}" \
                 --management-group-id ${{ env.managementGroupName }} \
                 --location ${{ inputs.location }} \
                 --template-file ${{ inputs.mainBicep }} \
