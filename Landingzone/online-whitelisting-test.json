@@ -1,0 +1,11 @@
+{
+  "labName": "whitelisting",
+  "environment": "test",
+  "managementGroupName": "online-prod",
+  "location": "FranceCentral",
+  "budget": "10",
+  "githubOrganizationName": "gazelle-cloud",
+  "githubRepoName": "whitelisting",
+  "ownerEmail": "foo@gazelle.cloud",
+  "engineer": "bar@gazelle.cloud"
+}
