@@ -1,0 +1,23 @@
+
+name: lz - online-bicepCloud-dev
+
+on:
+  push:
+    paths:
+      - 'Landingzone/online-bicepCloud-dev.json'
+
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  landingzone:
+    uses: ./.github/workflows/template-Landingzone.yml
+    with:
+      managementGroupName : online
+      managementGroupSuffix: prod
+      location: FranceCentral
+      parameterFile: ./Landingzone/online-bicepCloud-dev.json
+    secrets: inherit

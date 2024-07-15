@@ -1,0 +1,11 @@
+{
+  "labName": "bicepCloud",
+  "environment": "dev",
+  "managementGroupName": "online-prod",
+  "location": "FranceCentral",
+  "budget": "10",
+  "githubOrganizationName": "gazelle-cloud",
+  "githubRepoName": "bicepCloud",
+  "ownerEmail": "foo@gazelle.cloud",
+  "engineer": "bar@gazelle.cloud"
+}
