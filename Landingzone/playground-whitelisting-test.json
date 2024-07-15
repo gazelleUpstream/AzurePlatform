@@ -5,7 +5,7 @@
   "location": "FranceCentral",
   "budget": "10",
   "githubOrganizationName": "gazelle-cloud",
-  "githubRepoName": "experiments",
-  "ownerEmail": "param@gazelle.cloud",
-  "engineer": "foo@gazelle.cloud"
+  "githubRepoName": "playground",
+  "ownerEmail": "foo@gazelle.cloud",
+  "engineer": "bar@gazelle.cloud"
 }
