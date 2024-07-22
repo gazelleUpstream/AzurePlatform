@@ -66,6 +66,7 @@ jobs:
             echo "mgmtPreffix=$(echo ${{ env.managementGroupName }} | cut -d'-' -f1)" >> $GITHUB_ENV
 
         - name: create subscription
+          if: ${{ env.subscriptionId == null }}
           uses: azure/cli@v1
           with:
               inlineScript: |
