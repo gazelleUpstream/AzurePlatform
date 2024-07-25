@@ -6,10 +6,10 @@ on:
         environment:
             required: true
             type: string
-        managementGroupMainBicep:
+        templateFile:
             default: ./managementGroups/bicep/main-managementGroups.bicep
             type: string
-        managementGroupParameters:
+        templateParameters:
             default: ./managementGroups/parameters/managementGroups.bicepparam
             type: string
         deploymentName:
@@ -58,8 +58,8 @@ jobs:
                --name ${{ inputs.deploymentName }}-${{ inputs.environment}} \
                --location ${{  vars.AZURE_DEFAULT_LOCATION }} \
                --management-group-id ${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \
-               --template-file ${{ inputs.managementGroupMainBicep }} \
-               --parameters ${{ inputs.managementGroupParameters }} \
+               --template-file ${{ inputs.templateFile }} \
+               --parameters ${{ inputs.templateParameters }} \
                --parameters environment=${{ inputs.environment }} \
                --parameters topLevelManagementGroupName=${{ env.topLevelManagementGroupId }} \
                --parameters managementSubscriptionId=${{ vars.MANAGEMENT_SUBSCRIPTION_ID }}

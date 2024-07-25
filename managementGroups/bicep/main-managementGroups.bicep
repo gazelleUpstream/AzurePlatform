@@ -1,11 +1,9 @@
 targetScope = 'managementGroup'
 
 param childManagementGroupNames array
-param managementSubscriptionId string = ''
-
-// these values are fetch from Github variables
-param topLevelManagementGroupName string = ''
-param environment string = ''
+param managementSubscriptionId string 
+param topLevelManagementGroupName string
+param environment string 
 
 module child 'modules/managementGroups.bicep' = [
   for item in childManagementGroupNames: {

@@ -1,12 +1,18 @@
 using '../bicep/AzureIdentity.bicep'
 
-param location = 'francecentral'
-param environment = 'tst'
 param workloadName = 'identity'
-param subscriptionId = ''
+param location = readEnvironmentVariable('AZURE_DEFAULT_LOCATION', '')
+param environment = readEnvironmentVariable('environment', '')
+param subscriptionId = readEnvironmentVariable('MANAGEMENT_SUBSCRIPTION_ID', '')
 param identity = {
   policy: {
     federatedCredentials: {}
+    RBAC: {
+      scope: 'gazelle-${environment}'
+      roleDefinitions: [
+        '/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
+      ]
+    }
   }
   // landingzone: {
   //   federatedCredentials: {
@@ -15,12 +21,6 @@ param identity = {
   //       issuer: 'https://token.actions.githubusercontent.com'
   //       subject: 'repo:gazelle-cloud/lz:environment:test'
   //     }
-  //   }
-  //   RBAC: {
-  //     scope: 'online-test'
-  //     roleDefinitions: [
-  //       '/providers/Microsoft.Authorization/roleDefinitions/7f951dda-4ed3-4680-a7ca-43fe172d538d'
-  //     ]
   //   }
   // }
 }

@@ -32,16 +32,16 @@ module managedIdentity 'modules/uami.bicep' = [
   }
 ]
 
-// module rbac 'modules/roleAssignment.bicep' = [
-//   for (item, i) in items(identity): if (item.value.rbac.scope != '') {
-//     scope: managementGroup(item.value.rbac.scope)
-//     name: 'role-${item.key}'
-//     params: {
-//       principlesId: managedIdentity[i].outputs.principalId
-//       roleDefinitions: item.value.rbac.roleDefinitions
-//     }
-//   }
-// ]
+module rbac 'modules/roleAssignment.bicep' = [
+  for (item, i) in items(identity): if (item.value.rbac.scope != '') {
+    scope: managementGroup(item.value.rbac.scope)
+    name: 'role-${item.key}'
+    params: {
+      principlesId: managedIdentity[i].outputs.principalId
+      roleDefinitions: item.value.rbac.roleDefinitions
+    }
+  }
+]
 
 output gitHubEnviromentVariables array = [
   for (item, i) in items(identity): {

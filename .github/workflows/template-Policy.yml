@@ -6,11 +6,20 @@ on:
         environment:
             required: true
             type: string
+        templateFile:
+          default: ./policy/bicep/main.bicep
+          type: string
+        templateParameters:
+            default: ./policy/parameters/policy.bicepparam
+            type: string
+        deploymentName:
+            default: azurePolicies
+            type: string
 
 jobs:
     Policy:
         runs-on: ubuntu-latest
-        environment: ${{ inputs.environment }}-Policy
+        environment: ${{ inputs.environment }}-azurePlatform
         steps:
         - name: Checkout
           uses: actions/checkout@v4
@@ -25,8 +34,25 @@ jobs:
         - name: Azure login
           uses: azure/login@v1
           with:
-            client-id: ${{ vars.POLICY_CLIENT_ID }}
+            client-id: ${{ vars.APP_AZURE_PLATFORM_CLIENT_ID }}
             tenant-id: ${{ vars.AZURE_TENANT_ID}}
             allow-no-subscriptions: true
             enable-AzPSSession: false
+
+        - name: policies
+          uses: azure/cli@v1
+          with:
+              inlineScript: |
+                deployment=$(az stack mg create \
+                --name ${{ inputs.deploymentName }} \
+                --management-group-id ${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \
+                --location ${{  vars.AZURE_DEFAULT_LOCATION }} \
+                --template-file ${{ inputs.templateFile }} \
+                --parameters ${{ inputs.templateParameters }} \
+                --parameters location=${{  vars.AZURE_DEFAULT_LOCATION }} \
+                --parameters identityResoruceId=${{  vars.POLICY_RESOURCE_ID }} \
+                --parameters environment=${{ inputs.environment }} \
+                --deny-settings-mode None \
+                --action-on-unmanage deleteAll \
+                --yes)
 
