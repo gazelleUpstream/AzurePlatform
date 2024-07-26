@@ -9,7 +9,10 @@
         "parameters": {
             "listOfResourceTypesAllowed": {
                 "type": "array",
-                "defaultValue": []
+                "defaultValue": [
+                    "Microsoft.ManagedIdentity/userAssignedIdentities",
+                    "Microsoft.ManagedIdentity/userAssignedIdentities/federatedIdentityCredentials"
+                ]
             }
         },
         "policyDefinitions": [
