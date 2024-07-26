@@ -2,15 +2,15 @@ targetScope = 'managementGroup'
 
 param location string
 param policyName string
-param policyProperties object
+param builtInProperties object
 param identityResourceId string
 
 resource setdefinition 'Microsoft.Authorization/policySetDefinitions@2023-04-01' = {
   name: policyName
-  properties: policyProperties
+  properties: builtInProperties
 }
 
-resource ass 'Microsoft.Authorization/policyAssignments@2024-04-01' = {
+resource assignment 'Microsoft.Authorization/policyAssignments@2024-04-01' = {
   name: policyName
   identity: {
     type: 'UserAssigned'
@@ -21,5 +21,7 @@ resource ass 'Microsoft.Authorization/policyAssignments@2024-04-01' = {
   location: location
   properties: {
     policyDefinitionId: setdefinition.id
+    displayName: setdefinition.properties.displayName
+    metadata: setdefinition.properties.metadata
   }
 }

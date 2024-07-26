@@ -1,0 +1,40 @@
+{
+    "name": "testCustomDefinitions",
+    "builtIn": {
+        "displayName": "test custom policy definitions",
+        "metadata": {
+            "category": "General",
+            "description": "loro ipsum"
+        },
+        "parameters": {
+            "st_vnetAclrRules": {
+                "type": "string",
+                "defaultValue": "Deny"
+            },
+            "st_crossTenantReplication": {
+                "type": "string",
+                "defaultValue": "Modify"
+            }
+        },
+        "policyDefinitions": [
+            {
+                "policyDefinitionId": "{{topLevel}}/providers/Microsoft.Authorization/policyDefinitions/st_vnetAclrRules",
+                "policyDefinitionReferenceId": "st_vnetAclrRules",
+                "parameters": {
+                    "effect": {
+                        "value": "[parameters('st_vnetAclrRules')]"
+                    }
+                }
+            },
+            {
+                "policyDefinitionId": "{{topLevel}}/providers/Microsoft.Authorization/policyDefinitions/st_crossTenantReplication",
+                "policyDefinitionReferenceId": "st_crossTenantReplication",
+                "parameters": {
+                    "effect": {
+                        "value": "[parameters('st_crossTenantReplication')]"
+                    }
+                }
+            }
+        ]
+    }
+}

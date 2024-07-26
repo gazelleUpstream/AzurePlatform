@@ -4,32 +4,25 @@ on:
   workflow_call:
     inputs:
         environment:
-            required: true
-            type: string
-        templateFile:
-          default: ./policy/bicep/main.bicep
+          required: true
           type: string
-        templateParameters:
-            default: ./policy/parameters/policy.bicepparam
-            type: string
-        deploymentName:
-            default: azurePolicies
+        customDefinitionsTemplateFile:
+          default: ./policy/bicep/main-definitions.bicep
+          type: string
+        assignmentsTemplateFile:
+          default: ./policy/bicep/main-assignments.bicep
+          type: string
+        deploymentNameForAssignments:
+            default: policyAssignments
             type: string
 
 jobs:
-    Policy:
+    definitions:
         runs-on: ubuntu-latest
         environment: ${{ inputs.environment }}-azurePlatform
         steps:
         - name: Checkout
           uses: actions/checkout@v4
-
-        - name: get github token
-          id: github-token
-          uses: actions/create-github-app-token@v1
-          with:
-            app-id: ${{ vars.APP_GITHUB_BIGBANG_ID }}
-            private-key: ${{ secrets.APP_GITHUB_BIGBANG }}
 
         - name: Azure login
           uses: azure/login@v1
@@ -39,20 +32,125 @@ jobs:
             allow-no-subscriptions: true
             enable-AzPSSession: false
 
-        - name: policies
+        - name: Deploy policies
           uses: azure/cli@v1
           with:
               inlineScript: |
                 deployment=$(az stack mg create \
-                --name ${{ inputs.deploymentName }} \
+                --name policyDefinitions \
                 --management-group-id ${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \
                 --location ${{  vars.AZURE_DEFAULT_LOCATION }} \
-                --template-file ${{ inputs.templateFile }} \
-                --parameters ${{ inputs.templateParameters }} \
-                --parameters location=${{  vars.AZURE_DEFAULT_LOCATION }} \
-                --parameters identityResoruceId=${{  vars.POLICY_RESOURCE_ID }} \
-                --parameters environment=${{ inputs.environment }} \
+                --template-file ${{ inputs.customDefinitionsTemplateFile }} \
+                --parameters ./policy/parameters/customDefinitions.bicepparam \
                 --deny-settings-mode None \
                 --action-on-unmanage deleteAll \
                 --yes)
+    online:
+        runs-on: ubuntu-latest
+        environment: ${{ inputs.environment }}-azurePlatform
+        env:
+          deploymentScope: online
+        needs: definitions
+        steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: Azure login
+          uses: azure/login@v1
+          with:
+            client-id: ${{ vars.APP_AZURE_PLATFORM_CLIENT_ID }}
+            tenant-id: ${{ vars.AZURE_TENANT_ID}}
+            allow-no-subscriptions: true
+            enable-AzPSSession: false
+
+        - name: Deploy policies
+          uses: azure/cli@v1
+          with:
+              inlineScript: |
+                deployment=$(az stack mg create \
+                --name ${{ inputs.deploymentNameForAssignments }} \
+                --management-group-id ${{ env.deploymentScope }}-${{ inputs.environment }} \
+                --location ${{  vars.AZURE_DEFAULT_LOCATION }} \
+                --template-file ${{ inputs.assignmentsTemplateFile }} \
+                --parameters ./policy/parameters/${{ env.deploymentScope }}.bicepparam \
+                --parameters location=${{  vars.AZURE_DEFAULT_LOCATION }} \
+                --parameters identityResoruceId=${{  vars.POLICY_RESOURCE_ID }} \
+                --parameters environment=${{ inputs.environment }} \
+                --parameters topLevelManagementGroupName=${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \
+                --deny-settings-mode None \
+                --action-on-unmanage deleteAll \
+                --yes)
+
+    platform:
+        runs-on: ubuntu-latest
+        environment: ${{ inputs.environment }}-azurePlatform
+        env:
+          deploymentScope: platform
+        needs: definitions
+        steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: Azure login
+          uses: azure/login@v1
+          with:
+            client-id: ${{ vars.APP_AZURE_PLATFORM_CLIENT_ID }}
+            tenant-id: ${{ vars.AZURE_TENANT_ID}}
+            allow-no-subscriptions: true
+            enable-AzPSSession: false
+
+        - name: policies-platform
+          uses: azure/cli@v1
+          with:
+              inlineScript: |
+                deployment=$(az stack mg create \
+                --name ${{ inputs.deploymentNameForAssignments }} \
+                --management-group-id ${{ env.deploymentScope }}-${{ inputs.environment }} \
+                --location ${{  vars.AZURE_DEFAULT_LOCATION }} \
+                --template-file ${{ inputs.assignmentsTemplateFile }} \
+                --parameters ./policy/parameters/${{ env.deploymentScope }}.bicepparam \
+                --parameters location=${{  vars.AZURE_DEFAULT_LOCATION }} \
+                --parameters identityResoruceId=${{  vars.POLICY_RESOURCE_ID }} \
+                --parameters environment=${{ inputs.environment }} \
+                --parameters topLevelManagementGroupName=${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \
+                --deny-settings-mode None \
+                --action-on-unmanage deleteAll \
+                --yes)
+                
+    playground:
+        runs-on: ubuntu-latest
+        environment: ${{ inputs.environment }}-azurePlatform
+        env:
+          deploymentScope: playground
+        needs: definitions
+        steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: Azure login
+          uses: azure/login@v1
+          with:
+            client-id: ${{ vars.APP_AZURE_PLATFORM_CLIENT_ID }}
+            tenant-id: ${{ vars.AZURE_TENANT_ID}}
+            allow-no-subscriptions: true
+            enable-AzPSSession: false
+
+        - name: policies-platform
+          uses: azure/cli@v1
+          with:
+              inlineScript: |
+                deployment=$(az stack mg create \
+                --name ${{ inputs.deploymentNameForAssignments }} \
+                --management-group-id ${{ env.deploymentScope }}-${{ inputs.environment }} \
+                --location ${{  vars.AZURE_DEFAULT_LOCATION }} \
+                --template-file ${{ inputs.assignmentsTemplateFile }} \
+                --parameters ./policy/parameters/${{ env.deploymentScope }}.bicepparam \
+                --parameters location=${{  vars.AZURE_DEFAULT_LOCATION }} \
+                --parameters identityResoruceId=${{  vars.POLICY_RESOURCE_ID }} \
+                --parameters environment=${{ inputs.environment }} \
+                --parameters topLevelManagementGroupName=${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \
+                --deny-settings-mode None \
+                --action-on-unmanage deleteAll \
+                --yes)
+
 
