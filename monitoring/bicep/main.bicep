@@ -20,3 +20,4 @@ module la 'br/public:avm/res/operational-insights/workspace:0.4.0' = {
 }
 
 output logAnalyticsResourceId string = la.outputs.resourceId
+output logAnalyticsWorkspaceId string = la.outputs.logAnalyticsWorkspaceId

@@ -1,7 +1,7 @@
 {
     "name": "allowedLocations",
     "builtIn": {
-        "displayName": "Allowed locations for Azure resources",
+        "displayName": "Allowed locations",
         "metadata": {
             "category": "General",
             "description": "The allowed locations for Azure resources"

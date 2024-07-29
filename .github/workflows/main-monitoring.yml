@@ -5,15 +5,15 @@ on:
     branches-ignore:
       - main
     paths:
-        - 'Monitoring/**'
-        - '.github/workflows/template-Monitoring.yml'
-        - '.github/workflows/main-Monitoring.yml'
+        - 'monitoring/**'
+        - '.github/workflows/template-monitoring.yml'
+        - '.github/workflows/main-monitoring.yml'
 
   pull_request_target:
     types:
       - closed
     paths:
-      - 'Monitoring/**'
+      - 'monitoring/**'
   
   workflow_dispatch:
 
