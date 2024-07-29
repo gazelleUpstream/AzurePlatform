@@ -50,21 +50,22 @@ jobs:
                 --action-on-unmanage deleteAll \
                 --yes)
 
-              readOutputs=$(echo $deployment | jq '.outputs')
-              echo "Deployment Outputs: $readOutputs"
-              keyValuePairs=$(echo $readOutputs | jq -r 'to_entries[] | "\(.key)=\(.value.value)"')
-              IFS=$'\n'
-              for output in $keyValuePairs
-              do
-                echo $output
-                echo "$output" >> $GITHUB_ENV
-              done
-
+              envVariables=$(echo $deployment | jq '.outputs.gitHubEnviromentVariables.value')
+              echo "Deployment Outputs: $envVariables"
+              echo "monitoring=$(echo $envVariables | jq -c .)" >> $GITHUB_ENV
+         
         - name: set env variables
           env:
             GH_TOKEN: ${{ steps.github-token.outputs.token }}
           run: |
-              gh variable set logAnalytics_Resource_Id \
-              --body ${{ env.logAnalyticsResourceId }} \
-              --env ${{ inputs.environment}}-azurePlatform \
-              -R gazelle-cloud/AzurePlatform    
+              deploymentOutputs=$(echo $monitoring | jq .)
+              echo "Deployment Outputs: $deploymentOutputs"
+              
+              keys=$(echo $deploymentOutputs | jq -r 'keys[]')
+              for key in $keys; do
+                value=$(echo $deploymentOutputs | jq --arg k "$key" -r '.[$k]')
+                gh variable set $key \
+                  --body "$value" \
+                  --env "${{ inputs.environment }}-azurePlatform" \
+                  -R gazelle-cloud/AzurePlatform
+              done
