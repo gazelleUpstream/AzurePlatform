@@ -1,0 +1,74 @@
+name: template - monitoring
+
+on:
+  workflow_call:
+    inputs:
+        environment:
+          required: true
+          type: string
+        mainBicep:
+          default: ./monitoring/bicep/main.bicep
+          type: string
+
+jobs:
+    monitoring:
+        runs-on: ubuntu-latest
+        environment: ${{ inputs.environment }}-azurePlatform
+        steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: get github token
+          id: github-token
+          uses: actions/create-github-app-token@v1
+          with:
+            app-id: ${{ vars.APP_GITHUB_BIGBANG_ID }}
+            private-key: ${{ secrets.APP_GITHUB_BIGBANG }}
+
+        - name: Azure login
+          uses: azure/login@v1
+          with:
+            client-id: ${{ vars.APP_AZURE_PLATFORM_CLIENT_ID }}
+            tenant-id: ${{ vars.AZURE_TENANT_ID}}
+            allow-no-subscriptions: true
+            enable-AzPSSession: false
+
+        - name: managedIdentities
+          uses: azure/cli@v1
+          with:
+            inlineScript: |
+              az account set --subscription ${{ vars.MANAGEMENT_SUBSCRIPTION_ID }}
+
+              deployment=$(az stack sub create \
+                --name monitoring \
+                --location ${{ vars.AZURE_DEFAULT_LOCATION }} \
+                --template-file ${{ inputs.mainBicep }} \
+                --parameters './monitoring/parameters/main.bicepparam' \
+                --parameters environment=${{ inputs.environment }} \
+                --parameters location=${{  vars.AZURE_DEFAULT_LOCATION }} \
+                --deny-settings-mode None \
+                --action-on-unmanage deleteAll \
+                --yes)
+
+              envVariables=$(echo $deployment | jq '.outputs.gitHubEnviromentVariables.value')
+              echo "Deployment Outputs: $envVariables"
+              echo "AzureIdentity=$(echo $envVariables | jq -c .)" >> $GITHUB_ENV
+         
+        - name: set env variables
+          env:
+            GH_TOKEN: ${{ steps.github-token.outputs.token }}
+          run: |
+              deploymentOutputs=$(echo $AzureIdentity | jq .)
+              echo "Deployment Outputs: $deploymentOutputs"
+              
+              objects=$(echo $deploymentOutputs | jq -c '.[]')
+              for obj in $objects; do
+                keys=$(echo $obj | jq -r 'keys[]')
+                for key in $keys; do
+                  value=$(echo $obj | jq --arg k "$key" -r '.[$k]')
+                  gh variable set $key \
+                    --body "$value" \
+                    --env "${{ inputs.environment }}-azurePlatform" \
+                    -R gazelle-cloud/AzurePlatform
+                done
+              done
