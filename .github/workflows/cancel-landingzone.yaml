@@ -1,0 +1,33 @@
+name: Cancel landingzone
+
+on:
+  workflow_dispatch:
+    inputs:
+      subscriptionId:
+        required: true
+        default: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+
+permissions:
+  id-token: write
+  contents: read
+  
+jobs:
+  cancel-landingzone:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Azure login
+      uses: azure/login@v1
+      with:
+        client-id: '695ac74f-940a-4c50-8f07-5ee22e0512a1'
+        tenant-id: ${{ vars.AZURE_TENANT_ID}}
+        allow-no-subscriptions: true
+        enable-AzPSSession: false
+
+    - name: Cancel landingzone
+      uses: azure/cli@v1
+      with:
+          inlineScript: |
+            az account subscription cancel --subscription-id  ${{ inputs.subscriptionId }} --yes
