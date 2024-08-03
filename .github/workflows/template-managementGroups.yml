@@ -50,6 +50,10 @@ jobs:
                --role "Contributor" \
                --scope ${{ env.topLevelManagementGroupId }}
 
+              az role assignment create --assignee ${{ vars.APP_AZURE_PLATFORM_OBJECT_ID }} \
+               --role "Azure Deployment Stack Owner" \
+               --scope ${{ env.topLevelManagementGroupId }}
+
         - name: management group hierarchy
           uses: azure/cli@v1
           with:

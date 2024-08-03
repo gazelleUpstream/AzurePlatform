@@ -106,23 +106,36 @@ jobs:
                 params=$(jq -c . < ${{ inputs.parameterFile }})
                 echo "JSON content: $params"
                 
-                deployment=$(az stack mg create \
-                --name "lz-${{ env.labName }}-${{ env.environment}}" \
-                --management-group-id ${{ env.managementGroupName }} \
+                az account set --subscription ${{ env.subscriptionId }}
+
+                deployment=$(az stack sub create \
+                --name "landingzone-init" \
                 --location ${{ inputs.location }} \
                 --template-file ${{ inputs.mainBicep }} \
-                --parameters subscriptionId=${{ env.subscriptionId }} \
                 --parameters params=$params \
-                --deny-settings-mode None \
-                --action-on-unmanage deleteAll \
+                --deny-settings-mode 'denyWriteAndDelete' \
+                --action-on-unmanage 'deleteAll' \
+                --deny-settings-excluded-principals ${{ vars.APP_AZURE_PLATFORM_OBJECT_ID }} \
+                --deny-settings-excluded-actions 'Microsoft.ManagedIdentity/userAssignedIdentities/*/assign/action Microsoft.Network/virtualNetworks/subnets/write' \
+                --deny-settings-apply-to-child-scopes $true \
                 --yes)
 
-                readOutputs=$(echo $deployment | jq '.outputs')
-                echo "Deployment Outputs: $readOutputs"
-                keyValuePairs=$(echo $readOutputs | jq -r 'to_entries[] | "\(.key)=\(.value.value)"')
-                IFS=$'\n'
-                for output in $keyValuePairs
-                do
-                  echo $output
-                  echo "$output" >> $GITHUB_ENV
-                done
+                envVariables=$(echo $deployment | jq '.outputs.gitHubEnviromentVariables.value')
+                echo "Deployment Outputs: $envVariables"
+                echo "landingzoneInit=$(echo $envVariables | jq -c .)" >> $GITHUB_ENV
+
+        - name: set env variables
+          env:
+            GH_TOKEN: ${{ steps.github-token.outputs.token }}
+          run: |
+              deploymentOutputs=$(echo $landingzoneInit | jq .)
+              echo "Deployment Outputs: $deploymentOutputs"
+              
+              keys=$(echo $deploymentOutputs | jq -r 'keys[]')
+              for key in $keys; do
+                value=$(echo $deploymentOutputs | jq --arg k "$key" -r '.[$k]')
+                gh variable set $key \
+                  --body "$value" \
+                  --env "${{ env.environment }}-${{ env.githubRepoName }}" \
+                  -R gazelle-cloud/${{ env.githubRepoName }}
+              done

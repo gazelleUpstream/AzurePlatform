@@ -7,14 +7,14 @@ param githubOrganizationName string
 param githubRepoName string
 
 
-resource identityResourceGroup 'Microsoft.Resources/resourceGroups@2023-07-01' = {
-  name: 'landingzone-${labName}-${environment}'
+resource landingzoneResourceGroup 'Microsoft.Resources/resourceGroups@2023-07-01' = {
+  name: 'landingzone-resources'
   location: location
 }
 
 module identity 'br/public:avm/res/managed-identity/user-assigned-identity:0.2.1' = {
-  scope: identityResourceGroup
-  name: 'lz-managedIdentity-${labName}'
+  scope: landingzoneResourceGroup
+  name: 'lz-serviceConnection'
   params: {
     name: 'id-${labName}-${environment}'
     location: location
