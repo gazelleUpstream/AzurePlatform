@@ -3,9 +3,6 @@ name: template - Langingzone
 on:
   workflow_call:
     inputs:
-        environment:
-          default: prod
-          type: string
         managementGroupName:
           required: true
           type: string
@@ -14,9 +11,6 @@ on:
             type: string
         location:
             default: ${{ vars.AZURE_DEFAULT_LOCATION }}
-            type: string
-        deploymentInputsMainBicep:
-            default: ./Landingzone/bicep/main-inputs.bicep
             type: string
         mainBicep:
             default: ./Landingzone/bicep/main.bicep
@@ -29,7 +23,7 @@ on:
 jobs:
     Langingzone:
         runs-on: ubuntu-latest
-        environment: ${{ inputs.environment }}-azurePlatform
+        environment: ${{ inputs.managementGroupSuffix }}-azurePlatform
         steps:
         - name: Checkout
           uses: actions/checkout@v4
@@ -44,8 +38,8 @@ jobs:
         - name: Azure login
           uses: azure/login@v1
           with:
-            client-id: ${{ vars.APP_AZURE_PLATFORM_CLIENT_ID }}
-            tenant-id: ${{ vars.AZURE_TENANT_ID}}
+            client-id: ${{ vars.LANDINGZONES_CLIENT_ID }}
+            tenant-id: ${{ vars.AZURE_TENANT_ID }}
             allow-no-subscriptions: true
             enable-AzPSSession: false
 
@@ -115,7 +109,7 @@ jobs:
                 --parameters params=$params \
                 --deny-settings-mode 'denyWriteAndDelete' \
                 --action-on-unmanage 'deleteAll' \
-                --deny-settings-excluded-principals ${{ vars.APP_AZURE_PLATFORM_OBJECT_ID }} \
+                --deny-settings-excluded-principals ${{ vars.LANDINGZONES_PRINCIPAL_ID }} \
                 --deny-settings-excluded-actions 'Microsoft.ManagedIdentity/userAssignedIdentities/*/assign/action Microsoft.Network/virtualNetworks/subnets/write' \
                 --deny-settings-apply-to-child-scopes $true \
                 --yes)

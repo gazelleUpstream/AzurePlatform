@@ -68,7 +68,6 @@ jobs:
                 keys=$(echo $obj | jq -r 'keys[]')
                 for key in $keys; do
                   value=$(echo $obj | jq --arg k "$key" -r '.[$k]')
-                  # Use gh variable set command to set the environment variable
                   gh variable set $key \
                     --body "$value" \
                     --env "${{ inputs.environment }}-azurePlatform" \
