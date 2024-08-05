@@ -7,7 +7,7 @@ on:
             required: true
             type: string
         templateFile:
-            default: ./managementGroups/bicep/main-managementGroups.bicep
+            default: ./managementGroups/bicep/main.bicep
             type: string
         templateParameters:
             default: ./managementGroups/parameters/managementGroups.bicepparam
@@ -37,7 +37,7 @@ jobs:
         - name: Azure login
           uses: azure/login@v1
           with:
-            client-id: ${{ vars.APP_AZURE_PLATFORM_CLIENT_ID }}
+            client-id: ${{ vars.APP_PLATFORM_INIT_CLIENT_ID }}
             tenant-id: ${{ vars.AZURE_TENANT_ID}}
             allow-no-subscriptions: true
             enable-AzPSSession: false
@@ -46,11 +46,11 @@ jobs:
           uses: azure/cli@v1
           with:
             inlineScript: |
-              az role assignment create --assignee ${{ vars.APP_AZURE_PLATFORM_OBJECT_ID }} \
+              az role assignment create --assignee ${{ vars.APP_PLATFORM_INIT_PRINCIPAL_ID }} \
                --role "Contributor" \
                --scope ${{ env.topLevelManagementGroupId }}
 
-              az role assignment create --assignee ${{ vars.APP_AZURE_PLATFORM_OBJECT_ID }} \
+              az role assignment create --assignee ${{ vars.APP_PLATFORM_INIT_PRINCIPAL_ID }} \
                --role "Azure Deployment Stack Owner" \
                --scope ${{ env.topLevelManagementGroupId }}
 
@@ -65,5 +65,4 @@ jobs:
                --template-file ${{ inputs.templateFile }} \
                --parameters ${{ inputs.templateParameters }} \
                --parameters environment=${{ inputs.environment }} \
-               --parameters topLevelManagementGroupName=${{ env.topLevelManagementGroupId }} \
-               --parameters managementSubscriptionId=${{ vars.MANAGEMENT_SUBSCRIPTION_ID }}
+               --parameters topLevelManagementGroupName=${{ env.topLevelManagementGroupId }}
