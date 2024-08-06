@@ -91,6 +91,8 @@ jobs:
                   --display-name ${{ env.managementGroupName }}-${{ env.labName }}-${{ env.environment}} \
                   --billing-scope ${{ secrets.AZURE_BILLING_WORKLOADS }})
                 echo "Subscription Alias: $foo"
+                subscriptionId=$(echo $foo | jq -r '.properties.subscriptionId')
+                echo "subscriptionId=$subscriptionId" >> $GITHUB_ENV
 
         - name: rename subscription
           if: ${{ env.subscriptionId != null }}
