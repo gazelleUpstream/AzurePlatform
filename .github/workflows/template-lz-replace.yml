@@ -17,7 +17,7 @@ jobs:
     uses: ./.github/workflows/template-Landingzone.yml
     with:
       managementGroupName : replaceMe-lz-managementGroupName
-      managementGroupSuffix: replaceMe-lz-managementGroupSuffix
+      managementGroupHierarchy: replaceMe-lz-managementGroupHierarchy
       location: replaceMe-lz-location
       parameterFile: ./Landingzone/replaceMe-lz-landingzoneName.json
     secrets: inherit

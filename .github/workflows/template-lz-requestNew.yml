@@ -38,16 +38,19 @@ jobs:
 
           Write-Output $issueAsJsonIndented
           $location = $issue.location
+
+
+          ##delete these two values when down
           $mgmtGroupName = $issue.managementGroupName.Split("-")[0]
           $mgmtGroupSuffix = $issue.managementGroupName.Split("-")[1]
 
-          $fileName = "{0}-{1}-{2}" -f $mgmtGroupName, $issue.labName, $issue.environment
-          set-content -path "Landingzone/$fileName.json" -value $issueAsJsonIndented
+          $lzName = "{0}-{1}-{2}" -f $issue.managementGroupName, $issue.labName, $issue.environment
+          set-content -path "Landingzone/$lzName.json" -value $issueAsJsonIndented
           
-          write-output "landingzoneName=$fileName" >> $env:GITHUB_ENV
+          write-output "landingzoneName=$lzName" >> $env:GITHUB_ENV
           write-output "landingzoneLocation=$location" >> $env:GITHUB_ENV
-          write-output "managementGroupSuffix=$mgmtGroupSuffix" >> $env:GITHUB_ENV
-          write-output "managementGroupName=$mgmtGroupName" >> $env:GITHUB_ENV
+          write-output "managementGroupHierarchy=$issue.managementGroupHierarchy" >> $env:GITHUB_ENV
+          write-output "managementGroupName=$issue.managementGroupName" >> $env:GITHUB_ENV
         
       - name: init workflow file
         run: |
@@ -74,11 +77,11 @@ jobs:
           replace: "${{ env.managementGroupName }}"
           exclude: "**/template-*"
 
-      - name: replace - managementGroupSuffix
+      - name: replace - managementGroupHierarchy
         uses: jacobtomlinson/gha-find-replace@v3
         with:
-          find: "replaceMe-lz-managementGroupSuffix"
-          replace: "${{ env.managementGroupSuffix }}"
+          find: "replaceMe-lz-managementGroupHierarchy"
+          replace: "${{ env.managementGroupHierarchy }}"
           exclude: "**/template-*"
 
       - name: push param file

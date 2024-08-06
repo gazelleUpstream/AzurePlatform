@@ -37,9 +37,22 @@ body:
       multiple: false
       description:
       options: 
-        - online-prod
-        - playground-prod
-        - platform-prod
+        - online
+        - playground
+        - platform
+      default: 0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: managementGroupHierarchy
+    attributes:
+      label: management group hierarchy
+      multiple: false
+      description:
+      options: 
+        - prod
+        - test
       default: 0
     validations:
       required: true
@@ -62,6 +75,15 @@ body:
       label: budget
       description: 
       placeholder: "100"
+    validations:
+      required: true
+
+  - type: input
+    id: subscriptionId
+    attributes:
+      label: convert empty subscription tot a landingzone
+      description: 
+      placeholder: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
     validations:
       required: true
 
