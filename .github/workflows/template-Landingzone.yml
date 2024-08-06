@@ -21,7 +21,7 @@ on:
     
 
 jobs:
-    Langingzone:
+    create-landingzone:
         runs-on: ubuntu-latest
         environment: ${{ inputs.managementGroupHierarchy }}-azurePlatform
         steps:
@@ -54,33 +54,15 @@ jobs:
                   echo $item
                   echo "$item" >> $GITHUB_ENV
                 done  
-        
-        # - name: create subscription
-        #   if: ${{ env.subscriptionId == null }}
-        #   uses: azure/cli@v1
-        #   with:
-        #       inlineScript: |
-        #         params=$(jq -c . < ${{ inputs.parameterFile }})
-        #         echo "JSON content: $params"
                 
-        #         deployment=$(az deployment mg create \
-        #         --name "lz-${{ env.managementGroupHierarchy }}-${{ env.labName }}-${{ env.environment}}" \
-        #         --management-group-id ${{ env.managementGroupName }}-${{ env.managementGroupHierarchy}} \
-        #         --location ${{ inputs.location }} \
-        #         --template-file './Landingzone/bicep/modules/aliases.bicep' \
-        #         --parameters subscriptionName="${{ env.managementGroupHierarchy }}-${{ env.labName }}-${{ env.environment}}" \
-        #         --parameters billingScope=${{  secrets.BILLINGPROFILES_PLATFORM }})
-
-        #         readOutputs=$(echo $deployment | jq '.properties.outputs')
-        #         echo "Deployment Outputs: $readOutputs"
-        #         keyValuePairs=$(echo $readOutputs | jq -r 'to_entries[] | "\(.key)=\(.value.value)"')
-        #         IFS=$'\n'
-        #         for output in $keyValuePairs
-        #         do
-        #           echo $output
-        #           echo "$output" >> $GITHUB_ENV
-        #         done
-
+        - name: rename subscription
+          if: ${{ env.subscriptionId != null }}
+          uses: azure/cli@v1
+          with:
+              inlineScript: |
+                az account subscription rename --id ${{ env.subscriptionId}} \
+                  --name ${{ env.managementGroupName }}-${{ env.labName }}-${{ env.environment}}
+        
         - name: create subscription
           if: ${{ env.subscriptionId == null }}
           uses: azure/cli@v1
@@ -94,14 +76,6 @@ jobs:
                 subscriptionId=$(echo $foo | jq -r '.properties.subscriptionId')
                 echo "subscriptionId=$subscriptionId" >> $GITHUB_ENV
 
-        - name: rename subscription
-          if: ${{ env.subscriptionId != null }}
-          uses: azure/cli@v1
-          with:
-              inlineScript: |
-                az account subscription rename --id ${{ env.subscriptionId}} \
-                  --name ${{ env.managementGroupName }}-${{ env.labName }}-${{ env.environment}}
-                
         - name: move subscription
           uses: azure/cli@v1
           with:
