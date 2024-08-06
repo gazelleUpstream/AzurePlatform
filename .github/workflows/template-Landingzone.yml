@@ -55,7 +55,6 @@ jobs:
                   echo "$item" >> $GITHUB_ENV
                 done  
         
-
         - name: create subscription
           if: ${{ env.subscriptionId == null }}
           uses: azure/cli@v1
@@ -82,6 +81,14 @@ jobs:
                   echo "$output" >> $GITHUB_ENV
                 done
 
+        - name: rename subscription
+          if: ${{ env.subscriptionId != null }}
+          uses: azure/cli@v1
+          with:
+              inlineScript: |
+                az account subscription rename --id ${{ env.subscriptionId}} \
+                  --name ${{ env.managementGroupName }}-${{ env.labName }}-${{ env.environment}}
+                
         - name: move subscription
           uses: azure/cli@v1
           with:
