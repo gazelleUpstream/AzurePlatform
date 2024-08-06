@@ -38,19 +38,16 @@ jobs:
 
           Write-Output $issueAsJsonIndented
           $location = $issue.location
+          $mgmtGroupName = $issue.managementGroupName
+          $mgmtGroupHierarchy = $issue.managementGroupHierarchy
 
-
-          ##delete these two values when down
-          $mgmtGroupName = $issue.managementGroupName.Split("-")[0]
-          $mgmtGroupSuffix = $issue.managementGroupName.Split("-")[1]
-
-          $lzName = "{0}-{1}-{2}" -f $issue.managementGroupName, $issue.labName, $issue.environment
+          $lzName = "{0}-{1}-{2}" -f $mgmtGroupName, $issue.labName, $issue.environment
           set-content -path "Landingzone/$lzName.json" -value $issueAsJsonIndented
           
           write-output "landingzoneName=$lzName" >> $env:GITHUB_ENV
           write-output "landingzoneLocation=$location" >> $env:GITHUB_ENV
-          write-output "managementGroupHierarchy=$issue.managementGroupHierarchy" >> $env:GITHUB_ENV
-          write-output "managementGroupName=$issue.managementGroupName" >> $env:GITHUB_ENV
+          write-output "managementGroupHierarchy=$mgmtGroupHierarchy" >> $env:GITHUB_ENV
+          write-output "managementGroupName=$mgmtGroupName" >> $env:GITHUB_ENV
         
       - name: init workflow file
         run: |
