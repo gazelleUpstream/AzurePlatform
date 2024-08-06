@@ -1,0 +1,23 @@
+
+name: lz - playground-landingzone-test
+
+on:
+  push:
+    paths:
+      - 'Landingzone/playground-landingzone-test.json'
+
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  landingzone:
+    uses: ./.github/workflows/template-Landingzone.yml
+    with:
+      managementGroupName : playground
+      managementGroupHierarchy: test
+      location: FranceCentral
+      parameterFile: ./Landingzone/playground-landingzone-test.json
+    secrets: inherit
