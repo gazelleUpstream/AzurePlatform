@@ -85,7 +85,7 @@ body:
       description: 
       placeholder: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
     validations:
-      required: true
+      required: false
 
   - type: input
     id: githubOrganizationName
