@@ -28,7 +28,7 @@ jobs:
         github.ref != 'refs/heads/main'
     uses: ./.github/workflows/template-monitoring.yml
     with:
-      environment: test
+      managementGroupHierarchy: test
     secrets: inherit
 
   prod:
@@ -36,5 +36,5 @@ jobs:
          github.event.pull_request.merged == true
     uses: ./.github/workflows/template-monitoring.yml
     with:
-      environment: prod
+      managementGroupHierarchy: prod
     secrets: inherit

@@ -23,7 +23,7 @@ on:
 jobs:
     create-landingzone:
         runs-on: ubuntu-latest
-        environment: ${{ inputs.managementGroupHierarchy }}-azurePlatform
+        environment: ${{ inputs.managementGroupHierarchy }}
         steps:
         - name: Checkout
           uses: actions/checkout@v4
@@ -122,6 +122,6 @@ jobs:
                 value=$(echo $deploymentOutputs | jq --arg k "$key" -r '.[$k]')
                 gh variable set $key \
                   --body "$value" \
-                  --env "${{ env.environment }}-${{ env.githubRepoName }}" \
-                  -R gazelle-cloud/${{ env.githubRepoName }}
+                  --env ${{ env.environment }} \
+                  -R "${{ github.repository_owner }}/${{ env.githubRepoName }}"
               done

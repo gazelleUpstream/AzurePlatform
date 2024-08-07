@@ -3,17 +3,17 @@ name: template - Identity
 on:
   workflow_call:
     inputs:
-        environment:
+        managementGroupHierarchy:
           required: true
           type: string
         mainBicep:
-          default: ./Identity/bicep/AzureIdentity.bicep
+          default: ./Identity/bicep/managedIdentities.bicep
           type: string
 
 jobs:
     Identity:
         runs-on: ubuntu-latest
-        environment: ${{ inputs.environment }}-azurePlatform
+        environment: ${{ inputs.managementGroupHierarchy }}
         steps:
         - name: Checkout
           uses: actions/checkout@v4
@@ -24,6 +24,7 @@ jobs:
           with:
             app-id: ${{ vars.APP_GITHUB_BIGBANG_ID }}
             private-key: ${{ secrets.APP_GITHUB_BIGBANG }}
+            owner: ${{ github.repository_owner }}
 
         - name: Azure login
           uses: azure/login@v1
@@ -46,7 +47,7 @@ jobs:
                 --template-file ${{ inputs.mainBicep }} \
                 --parameters './Identity/parameters/AzureIdentity.bicepparam' \
                 --parameters subscriptionId=${{ vars.MANAGEMENT_SUBSCRIPTION_ID }} \
-                --parameters environment=${{ inputs.environment }} \
+                --parameters environment=${{ inputs.managementGroupHierarchy }} \
                 --parameters location=${{  vars.AZURE_DEFAULT_LOCATION }} \
                 --deny-settings-mode None \
                 --action-on-unmanage deleteAll \
@@ -70,7 +71,7 @@ jobs:
                   value=$(echo $obj | jq --arg k "$key" -r '.[$k]')
                   gh variable set $key \
                     --body "$value" \
-                    --env "${{ inputs.environment }}-azurePlatform" \
-                    -R gazelle-cloud/AzurePlatform
+                    --env ${{ inputs.managementGroupHierarchy }} \
+                    -R "${{ github.repository_owner }}/AzurePlatform"
                 done
               done

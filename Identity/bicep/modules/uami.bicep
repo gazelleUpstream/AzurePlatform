@@ -18,7 +18,6 @@ module fed 'federatedCredentials.bicep' = {
   }
 }
 
-
 output principalId string = identity.properties.principalId
 output clientId string = identity.properties.clientId
 output resourceId string = identity.id

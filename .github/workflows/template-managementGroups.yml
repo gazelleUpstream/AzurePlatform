@@ -3,7 +3,7 @@ name: template - managementGroups
 on:
   workflow_call:
     inputs:
-        environment:
+        managementGroupHierarchy:
             required: true
             type: string
         templateFile:
@@ -12,9 +12,6 @@ on:
         templateParameters:
             default: ./managementGroups/parameters/managementGroups.bicepparam
             type: string
-        deploymentName:
-            default: managementGroups
-            type: string
 
 env:
   topLevelManagementGroupId: /providers/Microsoft.Management/managementGroups/${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }}
@@ -22,17 +19,10 @@ env:
 jobs:
     managementGroups:
         runs-on: ubuntu-latest
-        environment: ${{ inputs.environment }}-azurePlatform
+        environment: ${{ inputs.managementGroupHierarchy }}
         steps:
         - name: Checkout
           uses: actions/checkout@v4
-
-        - name: get github token
-          id: github-token
-          uses: actions/create-github-app-token@v1
-          with:
-            app-id: ${{ vars.APP_GITHUB_BIGBANG_ID }}
-            private-key: ${{ secrets.APP_GITHUB_BIGBANG }}
 
         - name: Azure login
           uses: azure/login@v1
@@ -59,10 +49,10 @@ jobs:
           with:
             inlineScript: |
               az deployment mg create \
-               --name ${{ inputs.deploymentName }}-${{ inputs.environment}} \
+               --name managementGroups \
                --location ${{  vars.AZURE_DEFAULT_LOCATION }} \
                --management-group-id ${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \
                --template-file ${{ inputs.templateFile }} \
                --parameters ${{ inputs.templateParameters }} \
-               --parameters environment=${{ inputs.environment }} \
+               --parameters environment=${{ inputs.managementGroupHierarchy }} \
                --parameters topLevelManagementGroupName=${{ env.topLevelManagementGroupId }}

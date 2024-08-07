@@ -3,7 +3,7 @@ name: template - Policy
 on:
   workflow_call:
     inputs:
-        environment:
+        managementGroupHierarchy:
           required: true
           type: string
         customDefinitionsTemplateFile:
@@ -12,14 +12,10 @@ on:
         assignmentsTemplateFile:
           default: ./policy/bicep/main-assignments.bicep
           type: string
-        deploymentNameForAssignments:
-            default: policyAssignments
-            type: string
-
 jobs:
     definitions:
         runs-on: ubuntu-latest
-        environment: ${{ inputs.environment }}-azurePlatform
+        environment: ${{ inputs.managementGroupHierarchy }}
         steps:
         - name: Checkout
           uses: actions/checkout@v4
@@ -47,7 +43,7 @@ jobs:
                 --yes)
     online:
         runs-on: ubuntu-latest
-        environment: ${{ inputs.environment }}-azurePlatform
+        environment: ${{ inputs.managementGroupHierarchy }}
         env:
           deploymentScope: online
         needs: definitions
@@ -68,14 +64,14 @@ jobs:
           with:
               inlineScript: |
                 deployment=$(az stack mg create \
-                --name ${{ inputs.deploymentNameForAssignments }} \
-                --management-group-id ${{ env.deploymentScope }}-${{ inputs.environment }} \
+                --name policyAssignments \
+                --management-group-id ${{ env.deploymentScope }}-${{ inputs.managementGroupHierarchy }} \
                 --location ${{  vars.AZURE_DEFAULT_LOCATION }} \
                 --template-file ${{ inputs.assignmentsTemplateFile }} \
                 --parameters ./policy/parameters/${{ env.deploymentScope }}.bicepparam \
                 --parameters location=${{  vars.AZURE_DEFAULT_LOCATION }} \
                 --parameters identityResoruceId=${{  vars.POLICY_RESOURCE_ID }} \
-                --parameters environment=${{ inputs.environment }} \
+                --parameters environment=${{ inputs.managementGroupHierarchy }} \
                 --parameters topLevelManagementGroupName=${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \
                 --deny-settings-mode None \
                 --action-on-unmanage deleteAll \
@@ -83,7 +79,7 @@ jobs:
 
     platform:
         runs-on: ubuntu-latest
-        environment: ${{ inputs.environment }}-azurePlatform
+        environment: ${{ inputs.managementGroupHierarchy }}
         env:
           deploymentScope: platform
         needs: definitions
@@ -104,14 +100,14 @@ jobs:
           with:
               inlineScript: |
                 deployment=$(az stack mg create \
-                --name ${{ inputs.deploymentNameForAssignments }} \
-                --management-group-id ${{ env.deploymentScope }}-${{ inputs.environment }} \
+                --name policyAssignments \
+                --management-group-id ${{ env.deploymentScope }}-${{ inputs.managementGroupHierarchy }} \
                 --location ${{  vars.AZURE_DEFAULT_LOCATION }} \
                 --template-file ${{ inputs.assignmentsTemplateFile }} \
                 --parameters ./policy/parameters/${{ env.deploymentScope }}.bicepparam \
                 --parameters location=${{  vars.AZURE_DEFAULT_LOCATION }} \
                 --parameters identityResoruceId=${{  vars.POLICY_RESOURCE_ID }} \
-                --parameters environment=${{ inputs.environment }} \
+                --parameters environment=${{ inputs.managementGroupHierarchy }} \
                 --parameters topLevelManagementGroupName=${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \
                 --deny-settings-mode None \
                 --action-on-unmanage deleteAll \
@@ -119,7 +115,7 @@ jobs:
                 
     playground:
         runs-on: ubuntu-latest
-        environment: ${{ inputs.environment }}-azurePlatform
+        environment: ${{ inputs.managementGroupHierarchy }}
         env:
           deploymentScope: playground
         needs: definitions
@@ -140,14 +136,14 @@ jobs:
           with:
               inlineScript: |
                 deployment=$(az stack mg create \
-                --name ${{ inputs.deploymentNameForAssignments }} \
-                --management-group-id ${{ env.deploymentScope }}-${{ inputs.environment }} \
+                --name policyAssignments \
+                --management-group-id ${{ env.deploymentScope }}-${{ inputs.managementGroupHierarchy }} \
                 --location ${{  vars.AZURE_DEFAULT_LOCATION }} \
                 --template-file ${{ inputs.assignmentsTemplateFile }} \
                 --parameters ./policy/parameters/${{ env.deploymentScope }}.bicepparam \
                 --parameters location=${{  vars.AZURE_DEFAULT_LOCATION }} \
                 --parameters identityResoruceId=${{  vars.POLICY_RESOURCE_ID }} \
-                --parameters environment=${{ inputs.environment }} \
+                --parameters environment=${{ inputs.managementGroupHierarchy }} \
                 --parameters topLevelManagementGroupName=${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \
                 --deny-settings-mode None \
                 --action-on-unmanage deleteAll \

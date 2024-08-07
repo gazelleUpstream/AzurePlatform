@@ -1,8 +1,8 @@
-using '../bicep/AzureIdentity.bicep'
+using '../bicep/managedIdentities.bicep'
 
 param workloadName = 'identity'
 param location = readEnvironmentVariable('AZURE_DEFAULT_LOCATION', '')
-param environment = readEnvironmentVariable('environment', '')
+param environment = readEnvironmentVariable('managementGroupHierarchy', '')
 param subscriptionId = readEnvironmentVariable('MANAGEMENT_SUBSCRIPTION_ID', '')
 param identity = {
   policy: {
@@ -19,7 +19,7 @@ param identity = {
       github: {
         audiences: ['api://AzureADTokenExchange']
         issuer: 'https://token.actions.githubusercontent.com'
-        subject: 'repo:gazelle-cloud/AzurePlatform:environment:${environment}-AzurePlatform'
+        subject: 'repo:gazelle-cloud/AzurePlatform:environment:${environment}'
       }
     }
     RBAC: {

@@ -2,7 +2,7 @@ targetScope = 'managementGroup'
 
 param childManagementGroupNames array
 param topLevelManagementGroupName string
-param environment string 
+param environment string
 
 module child 'modules/managementGroups.bicep' = [
   for item in childManagementGroupNames: {
