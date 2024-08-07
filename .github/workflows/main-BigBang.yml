@@ -2,23 +2,61 @@ name: az - BigBang
 
 on:
   workflow_dispatch:
+    inputs:
+      managementGroupHierarchy:
+        description: 'Management Group Hierarchy'
+        required: true
+        default: 'test'
+        type: choice
+        options:
+          - 'test'
+          - 'prod'
 
 permissions:
   id-token: write
   contents: read
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    permissions: write-all
-    environment: test
-    steps:
-      - name: managementGroups
-        uses: ./.github/workflows/template-managementGroups.yml
-        with:
-          managementGroupHierarchy: test
+  mnanagementGroups:
+    uses: ./.github/workflows/template-managementGroups.yml
+    with:
+      managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy }}
 
-      - name: identity
-        uses: ./.github/workflows/template-Identity.yml
-        with:
-          managementGroupHierarchy: test
+  re-run:
+    uses: ./.github/workflows/template-managementGroups.yml
+    if: failure()
+    with:
+      managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy }}
+
+  identity:
+    needs: mnanagementGroups
+    uses: ./.github/workflows/template-Identity.yml
+    with:
+      managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy }}
+    secrets: inherit
+
+  monitoring:
+    needs: identity
+    uses: ./.github/workflows/template-monitoring.yml
+    with:
+      managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy }}
+    secrets: inherit
+
+  policies:
+    needs: monitoring
+    uses: ./.github/workflows/template-Policy.yml
+    with:
+      managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy }}
+    secrets: inherit
+
+  managementLandinzone:
+    needs: policies
+    uses: ./.github/workflows/template-Landingzone.yml
+    with:
+      managementGroupName : platform
+      managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy }}
+      location: FranceCentral
+      parameterFile: ./Landingzone/platform-management-${{ github.event.inputs.managementGroupHierarchy }}.json
+    secrets: inherit
+
+  
