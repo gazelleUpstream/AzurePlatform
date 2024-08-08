@@ -17,40 +17,36 @@ permissions:
   contents: read
 
 jobs:
-  mnanagementGroups:
+  hierarchy:
     uses: ./.github/workflows/template-managementGroups.yml
     with:
       managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy }}
 
-  re-run:
-    uses: ./.github/workflows/template-managementGroups.yml
-    if: failure()
-    with:
-      managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy }}
-
-  identity:
-    needs: mnanagementGroups
+  management-I:
+    needs: hierarchy
     uses: ./.github/workflows/template-Identity.yml
     with:
       managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy }}
     secrets: inherit
 
-  monitoring:
-    needs: identity
+  management-II:
+    needs: hierarchy
     uses: ./.github/workflows/template-monitoring.yml
     with:
       managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy }}
     secrets: inherit
 
-  policies:
-    needs: monitoring
+  policy:
+    needs: 
+      - management-I
+      - management-II
     uses: ./.github/workflows/template-Policy.yml
     with:
       managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy }}
     secrets: inherit
 
-  managementLandinzone:
-    needs: policies
+  lz:
+    needs: policy
     uses: ./.github/workflows/template-Landingzone.yml
     with:
       managementGroupName : platform

@@ -27,7 +27,7 @@ jobs:
             owner: ${{ github.repository_owner }}
 
         - name: Azure login
-          uses: azure/login@v1
+          uses: azure/login@v2
           with:
             client-id: ${{ vars.APP_PLATFORM_INIT_CLIENT_ID }}
             tenant-id: ${{ vars.AZURE_TENANT_ID}}
@@ -35,7 +35,7 @@ jobs:
             enable-AzPSSession: false
 
         - name: managedIdentities
-          uses: azure/cli@v1
+          uses: azure/cli@v2
           with:
             inlineScript: |
               az account set --subscription ${{ vars.MANAGEMENT_SUBSCRIPTION_ID }}

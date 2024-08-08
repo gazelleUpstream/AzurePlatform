@@ -20,7 +20,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Azure login
-      uses: azure/login@v1
+      uses: azure/login@v2
       with:
         client-id: '695ac74f-940a-4c50-8f07-5ee22e0512a1'
         tenant-id: ${{ vars.AZURE_TENANT_ID}}
@@ -28,7 +28,7 @@ jobs:
         enable-AzPSSession: false
 
     - name: Cancel landingzone
-      uses: azure/cli@v1
+      uses: azure/cli@v2
       with:
           inlineScript: |
             az account subscription cancel --subscription-id  ${{ inputs.subscriptionId }} --yes

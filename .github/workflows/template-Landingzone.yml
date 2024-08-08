@@ -37,7 +37,7 @@ jobs:
             owner: ${{ github.repository_owner }}
 
         - name: Azure login
-          uses: azure/login@v1
+          uses: azure/login@v2
           with:
             client-id: ${{ vars.LANDINGZONES_CLIENT_ID }}
             tenant-id: ${{ vars.AZURE_TENANT_ID }}
@@ -45,7 +45,7 @@ jobs:
             enable-AzPSSession: false
 
         - name: fetch JSON values
-          uses: azure/cli@v1
+          uses: azure/cli@v2
           with:
             inlineScript: |
                 params=$(jq -r 'to_entries[] | "\(.key)=\(.value)"' ${{ inputs.parameterFile }})
@@ -58,7 +58,7 @@ jobs:
                 
         - name: rename subscription
           if: ${{ env.subscriptionId != null }}
-          uses: azure/cli@v1
+          uses: azure/cli@v2
           with:
               inlineScript: |
                 az account subscription rename --id ${{ env.subscriptionId}} \
@@ -66,7 +66,7 @@ jobs:
         
         - name: create subscription
           if: ${{ env.subscriptionId == null }}
-          uses: azure/cli@v1
+          uses: azure/cli@v2
           with:
               inlineScript: |
                 foo=$(az account alias create --workload 'Production' \
@@ -78,7 +78,7 @@ jobs:
                 echo "subscriptionId=$subscriptionId" >> $GITHUB_ENV
 
         - name: move subscription
-          uses: azure/cli@v1
+          uses: azure/cli@v2
           with:
               inlineScript: |
                 az account management-group subscription add \
@@ -86,7 +86,7 @@ jobs:
                   --subscription ${{ env.subscriptionId}}
 
         - name: create landingzone
-          uses: azure/cli@v1
+          uses: azure/cli@v2
           with:
               inlineScript: |
                 params=$(jq -c . < ${{ inputs.parameterFile }})
