@@ -1,0 +1,108 @@
+name: template - tenant level deployment
+
+on:
+  workflow_call:
+    inputs:
+        managementGroupHierarchy:
+            required: true
+            type: string
+
+env:
+  topLevelManagementGroupId: /providers/Microsoft.Management/managementGroups/${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }}
+
+jobs:
+    managementGroups:
+        runs-on: ubuntu-latest
+        environment: ${{ inputs.managementGroupHierarchy }}
+        steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: Azure login
+          uses: azure/login@v2
+          with:
+            client-id: ${{ vars.APP_PLATFORM_INIT_CLIENT_ID }}
+            tenant-id: ${{ vars.AZURE_TENANT_ID}}
+            allow-no-subscriptions: true
+            enable-AzPSSession: false
+
+        - name: init RBAC
+          uses: azure/cli@v2
+          with:
+            inlineScript: |
+              az role assignment create --assignee ${{ vars.APP_PLATFORM_INIT_PRINCIPAL_ID }} \
+               --role "Contributor" \
+               --scope ${{ env.topLevelManagementGroupId }}
+
+              az role assignment create --assignee ${{ vars.APP_PLATFORM_INIT_PRINCIPAL_ID }} \
+               --role "Azure Deployment Stack Owner" \
+               --scope ${{ env.topLevelManagementGroupId }}
+
+        - name: management group hierarchy
+          uses: azure/cli@v2
+          with:
+            inlineScript: |
+              az deployment mg create \
+               --name managementGroups \
+               --location ${{  vars.AZURE_DEFAULT_LOCATION }} \
+               --management-group-id ${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \
+               --template-file ./tenantLevel/bicep/managementGroups.bicep \
+               --parameters ./tenantLevel/parameters/managementGroups.bicepparam \
+               --parameters environment=${{ inputs.managementGroupHierarchy }} \
+               --parameters topLevelManagementGroupName=${{ env.topLevelManagementGroupId }}
+
+    Billing:
+        runs-on: ubuntu-latest
+        environment: ${{ inputs.managementGroupHierarchy }}
+        steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: get github token
+          id: github-token
+          uses: actions/create-github-app-token@v1
+          with:
+            app-id: ${{ vars.APP_GITHUB_BIGBANG_ID }}
+            private-key: ${{ secrets.APP_GITHUB_BIGBANG }}
+            owner: ${{ github.repository_owner }}
+
+        - name: Azure login
+          uses: azure/login@v2
+          with:
+            client-id: ${{ vars.APP_PLATFORM_INIT_CLIENT_ID }}
+            tenant-id: ${{ vars.AZURE_TENANT_ID}}
+            allow-no-subscriptions: true
+            enable-AzPSSession: false
+
+        - name: invoice sections
+          uses: azure/cli@v2
+          with:
+            inlineScript: |
+              deployment=$(az deployment mg create \
+               --name InvoiceSections \
+               --location ${{  vars.AZURE_DEFAULT_LOCATION }} \
+               --management-group-id ${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \
+               --template-file ./tenantLevel/bicep/billing.bicep \
+               --parameters ./tenantLevel/parameters/billing.bicepparam)
+
+              envVariables=$(echo $deployment | jq '.properties.outputs.gitHubEnviromentVariables.value')
+              echo "Deployment Outputs: $envVariables"
+              echo "billing=$(echo $envVariables | jq -c .)" >> $GITHUB_ENV
+
+        - name: set env variables
+          env:
+            GH_TOKEN: ${{ steps.github-token.outputs.token }}
+          run: |
+              deploymentOutputs=$(echo $billing | jq .)
+              echo "Deployment Outputs: $deploymentOutputs"
+              
+              objects=$(echo $deploymentOutputs | jq -c '.[]')
+              for obj in $objects; do
+                keys=$(echo $obj | jq -r 'keys[]')
+                for key in $keys; do
+                  value=$(echo $obj | jq --arg k "$key" -r '.[$k]')
+                  gh variable set $key \
+                    --body "$value" \
+                    --org ${{ github.repository_owner }}
+                done
+              done

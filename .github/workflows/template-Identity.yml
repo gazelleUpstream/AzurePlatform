@@ -54,7 +54,7 @@ jobs:
               echo "Deployment Outputs: $envVariables"
               echo "managedIdentities=$(echo $envVariables | jq -c .)" >> $GITHUB_ENV
          
-        - name: set env variables (managedIdentities)
+        - name: set env variables
           env:
             GH_TOKEN: ${{ steps.github-token.outputs.token }}
           run: |

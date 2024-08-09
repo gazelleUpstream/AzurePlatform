@@ -17,20 +17,20 @@ permissions:
   contents: read
 
 jobs:
-  hierarchy:
-    uses: ./.github/workflows/template-managementGroups.yml
+  tenantLevel:
+    uses: ./.github/workflows/template-tenantLevel.yml
     with:
       managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy }}
 
-  management-I:
-    needs: hierarchy
+  identity:
+    needs: tenantLevel
     uses: ./.github/workflows/template-Identity.yml
     with:
       managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy }}
     secrets: inherit
 
-  management-II:
-    needs: hierarchy
+  management:
+    needs: tenantLevel
     uses: ./.github/workflows/template-monitoring.yml
     with:
       managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy }}
@@ -38,8 +38,8 @@ jobs:
 
   policy:
     needs: 
-      - management-I
-      - management-II
+      - identity
+      - management
     uses: ./.github/workflows/template-Policy.yml
     with:
       managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy }}
