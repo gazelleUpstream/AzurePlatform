@@ -1,0 +1,51 @@
+name: template - gitHub
+
+on:
+  workflow_call:
+    inputs:
+        managementGroupHierarchy:
+            required: true
+            type: string
+
+jobs:
+    environmentVars:
+        runs-on: ubuntu-latest
+        environment: ${{ inputs.managementGroupHierarchy }}
+        steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: get github token
+          id: github-token
+          uses: actions/create-github-app-token@v1
+          with:
+            app-id: ${{ vars.APP_GITHUB_BIGBANG_ID }}
+            private-key: ${{ secrets.APP_GITHUB_BIGBANG }}
+            owner: ${{ github.repository_owner }}
+
+        - name: set env variables
+          env:
+            GH_TOKEN: ${{ steps.github-token.outputs.token }}
+            MANAGEMENT_SUBSCRIPTION_ID: "MANAGEMENT_SUBSCRIPTION_ID_${{ inputs.managementGroupHierarchy }}"
+            APP_PLATFORM_INIT_CLIENT_ID: "APP_PLATFORM_INIT_CLIENT_ID_${{ inputs.managementGroupHierarchy }}"
+            APP_PLATFORM_INIT_PRINCIPAL_ID: "APP_PLATFORM_INIT_PRINCIPAL_ID_${{ inputs.managementGroupHierarchy }}"
+          run: |
+              gh variable set MANAGEMENT_SUBSCRIPTION_ID \
+                --body ${{ vars[env.MANAGEMENT_SUBSCRIPTION_ID] }} \
+                --env ${{ inputs.managementGroupHierarchy }} \
+                -R "${{ github.repository_owner }}/AzurePlatform"
+
+              gh variable set APP_PLATFORM_INIT_CLIENT_ID \
+                --body ${{ vars[env.APP_PLATFORM_INIT_CLIENT_ID] }} \
+                --env ${{ inputs.managementGroupHierarchy }} \
+                -R "${{ github.repository_owner }}/AzurePlatform"
+
+              gh variable set APP_PLATFORM_INIT_PRINCIPAL_ID \
+                --body ${{ vars[env.APP_PLATFORM_INIT_PRINCIPAL_ID ]}} \
+                --env ${{ inputs.managementGroupHierarchy }} \
+                -R "${{ github.repository_owner }}/AzurePlatform"
+
+              gh variable set TOP_LEVEL_MANAGEMENTGROUP_NAME \
+              --body "${{ vars.MANAGEMENTGROUP_HIERARCHY_NAME }}-${{ inputs.managementGroupHierarchy}}" \
+              --env ${{ inputs.managementGroupHierarchy }} \
+              -R "${{ github.repository_owner }}/AzurePlatform"
