@@ -37,7 +37,6 @@ jobs:
           $issueAsJsonIndented = ConvertTo-Json $issue
 
           Write-Output $issueAsJsonIndented
-          $location = $issue.location
           $mgmtGroupName = $issue.managementGroupName
           $mgmtGroupHierarchy = $issue.managementGroupHierarchy
 
@@ -45,7 +44,6 @@ jobs:
           set-content -path "Landingzone/$lzName.json" -value $issueAsJsonIndented
           
           write-output "landingzoneName=$lzName" >> $env:GITHUB_ENV
-          write-output "landingzoneLocation=$location" >> $env:GITHUB_ENV
           write-output "managementGroupHierarchy=$mgmtGroupHierarchy" >> $env:GITHUB_ENV
           write-output "managementGroupName=$mgmtGroupName" >> $env:GITHUB_ENV
         
@@ -60,13 +58,6 @@ jobs:
           replace: "${{ env.landingzoneName }}"
           exclude: "**/template-*"
 
-      - name: replace - location
-        uses: jacobtomlinson/gha-find-replace@v3
-        with:
-          find: "replaceMe-lz-location"
-          replace: "${{ env.landingzoneLocation }}"
-          exclude: "**/template-*"
-   
       - name: replace - managementGroupName
         uses: jacobtomlinson/gha-find-replace@v3
         with:

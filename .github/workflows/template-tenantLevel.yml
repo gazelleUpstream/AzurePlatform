@@ -21,7 +21,7 @@ jobs:
         - name: Azure login
           uses: azure/login@v2
           with:
-            client-id: ${{ vars.APP_PLATFORM_INIT_CLIENT_ID }}
+            client-id: ${{ vars.AZURE_PLATFORM_CLIENT_ID }}
             tenant-id: ${{ vars.AZURE_TENANT_ID}}
             allow-no-subscriptions: true
             enable-AzPSSession: false
@@ -30,11 +30,11 @@ jobs:
           uses: azure/cli@v2
           with:
             inlineScript: |
-              az role assignment create --assignee ${{ vars.APP_PLATFORM_INIT_PRINCIPAL_ID }} \
+              az role assignment create --assignee ${{ vars.AZURE_PLATFORM_PRINCIPAL_ID }} \
                --role "Contributor" \
                --scope ${{ env.topLevelManagementGroupId }}
 
-              az role assignment create --assignee ${{ vars.APP_PLATFORM_INIT_PRINCIPAL_ID }} \
+              az role assignment create --assignee ${{ vars.AZURE_PLATFORM_PRINCIPAL_ID }} \
                --role "Azure Deployment Stack Owner" \
                --scope ${{ env.topLevelManagementGroupId }}
 
@@ -69,7 +69,7 @@ jobs:
         - name: Azure login
           uses: azure/login@v2
           with:
-            client-id: ${{ vars.APP_PLATFORM_INIT_CLIENT_ID }}
+            client-id: ${{ vars.AZURE_PLATFORM_CLIENT_ID }}
             tenant-id: ${{ vars.AZURE_TENANT_ID}}
             allow-no-subscriptions: true
             enable-AzPSSession: false
@@ -103,6 +103,6 @@ jobs:
                   value=$(echo $obj | jq --arg k "$key" -r '.[$k]')
                   gh variable set $key \
                     --body "$value" \
-                    --org ${{ github.repository_owner }}
+                    -R "${{ github.repository_owner }}/AzurePlatform"
                 done
               done
