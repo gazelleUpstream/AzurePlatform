@@ -54,15 +54,15 @@ body:
     validations:
       required: true
 
-  - type: checkboxes
+  - type: dropdown
     id: managementGroupHierarchy
     attributes:
       label: management group hierarchy
       multiple: false
       description:
       options: 
-        - label: prod
-        - label: test
+        - prod
+        - test
       default: 0
     validations:
       required: true
