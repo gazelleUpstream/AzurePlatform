@@ -1,0 +1,13 @@
+{
+  "labName": "test",
+  "environment": "test",
+  "location": "FranceCentral",
+  "billingScope": "test",
+  "managementGroupName": "online",
+  "managementGroupHierarchy": "test",
+  "budget": "10",
+  "subscriptionId": "",
+  "githubRepoName": "test",
+  "ownerEmail": "foo@bar.com",
+  "engineer": "bar@foo.com"
+}
