@@ -3,7 +3,7 @@ targetScope = 'subscription'
 param labName string
 param environment string
 param location string
-param githubOrganizationName string
+param githubOrganizationName string = 'gazelle-cloud'
 param githubRepoName string
 
 

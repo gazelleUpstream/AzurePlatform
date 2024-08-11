@@ -6,7 +6,6 @@
   "location": "FranceCentral",
   "budget": "50",
   "subscriptionId": "84e64f94-714d-4c07-9f03-f07af8380b36",
-  "githubOrganizationName": "gazelle-cloud",
   "githubRepoName": "MSDN",
   "ownerEmail": "param@gazelle.cloud",
   "engineer": "foo@gazelle.cloud"

@@ -18,5 +18,6 @@ jobs:
     with:
       managementGroupName : replaceMe-lz-managementGroupName
       managementGroupHierarchy: replaceMe-lz-managementGroupHierarchy
+      location: replaceMe-lz-location
       parameterFile: ./Landingzone/replaceMe-lz-landingzoneName.json
     secrets: inherit

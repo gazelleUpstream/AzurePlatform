@@ -1,4 +1,4 @@
-targetScope  = 'subscription'
+targetScope = 'subscription'
 
 param params object
 
@@ -13,7 +13,6 @@ module identity 'modules/identity.bicep' = {
     labName: params.labName
     environment: params.environment
     location: params.location
-    githubOrganizationName: params.githubOrganizationName
     githubRepoName: params.githubRepoName
   }
 }
@@ -38,8 +37,6 @@ module resourceLevelTags 'modules/policyAssignment.bicep' = [
     }
   }
 ]
-
-
 
 module securityContacts 'modules/securityContacts.bicep' = {
   name: 'lz-security-contacts'
