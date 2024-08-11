@@ -117,9 +117,14 @@ jobs:
           env:
             GH_TOKEN: ${{ steps.github-token.outputs.token }}
           run: |
+              echo "create environment"
+
+              gh api --method PUT -H "Accept: application/vnd.github+json" \
+              repos/${{ github.repository_owner }}/${{ env.githubRepoName }}/environments/${{ env.environment }}
+        
               deploymentOutputs=$(echo $landingzoneInit | jq .)
               echo "Deployment Outputs: $deploymentOutputs"
-              
+
               keys=$(echo $deploymentOutputs | jq -r 'keys[]')
               for key in $keys; do
                 value=$(echo $deploymentOutputs | jq --arg k "$key" -r '.[$k]')
