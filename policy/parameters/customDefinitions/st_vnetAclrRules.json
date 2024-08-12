@@ -1,7 +1,7 @@
 {
     "name": "st_vnetAclrRules",
     "properties": {
-        "DisplayName": "Disable your storage accounts from potential threats using virtual network rules",
+        "DisplayName": "my favorite policy",
         "mode": "All",
         "metadata": {
             "category": "Storage"

@@ -7,3 +7,6 @@ resource policyDefinition 'Microsoft.Authorization/policyDefinitions@2023-04-01'
   name: policyName
   properties: policyProperties
 }
+
+output resourcrId string = policyDefinition.id
+output name string = policyDefinition.name

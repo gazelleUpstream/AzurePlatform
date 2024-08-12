@@ -1,7 +1,7 @@
 {
     "name": "st_crossTenantReplication",
     "properties": {
-        "DisplayName": "Storage account should disallow cross tenant blob replication",
+        "DisplayName": "another cool policy",
         "mode": "All",
         "metadata": {
             "category": "Storage"
