@@ -9,10 +9,10 @@ param logAnalytics string
 param identityResoruceId string
 param location string
 
-var favoriteCustomPolicy = loadJsonContent('../parameters/customDefinitions/st_vnetAclrRules.json')
+var favoriteCustomPolicy = loadJsonContent('customDefinitions/st_vnetAclrRules.json')
 // var anotherCoolPolicy = loadJsonContent('../parameters/customDefinitions/st_corssTenantReplication.json')
 
-module favortitePolicy 'modules/policyDefinitions.bicep' = {
+module favortitePolicy '../bicep/modules/policyDefinitions.bicep' = {
   name: 'my-favorite-custom-policy'
   params: {
     policyName: favoriteCustomPolicy.name
@@ -28,7 +28,7 @@ module favortitePolicy 'modules/policyDefinitions.bicep' = {
 //   }
 // }
 
-module setDefinition 'modules/policySetDefinitions.bicep' = {
+module setDefinition '../bicep/modules/policySetDefinitions.bicep' = {
   name: 'my-custom-init'
   params: {
     policyName: 'something-cool'
@@ -73,7 +73,7 @@ module setDefinition 'modules/policySetDefinitions.bicep' = {
   }
 }
 
-module assignment 'modules/policyAssignments.bicep' = {
+module assignment '../bicep/modules/policyAssignments.bicep' = {
   name: 'my-facorite-policy'
   params: {
     policyName: setDefinition.outputs.name
