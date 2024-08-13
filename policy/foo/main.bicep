@@ -52,7 +52,7 @@ module setDefinition '../bicep/modules/policySetDefinitions.bicep' = {
       //   }
       // }
       {
-        policyDefinitionId: '/providers/Microsoft.Authorization/policyDefinitions/fea83f6c-a18a-4338-8f1f-80ecba4c5643'
+        policyDefinitionId: '/providers/Microsoft.Authorization/policyDefinitions/818719e5-1338-4776-9a9d-3c31e4df5986'
         policyDefinitionReferenceId: 'logAnalytics'
         parameters: {
           effect: {
