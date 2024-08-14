@@ -1,4 +1,4 @@
-import * as definitions from '../bicep/modules/assignment.bicep'
+import * as definitions from '../../bicep/modules/assignment.bicep'
 
 targetScope = 'managementGroup'
 
@@ -6,7 +6,11 @@ param policyName string = 'allowedLocations'
 param displayName string = 'allowed locations'
 param location string
 param identityResoruceId string
-param listOfAllowedLocations array
+param listOfAllowedLocations array = [
+  'franceCentral'
+]
+#disable-next-line no-unused-params
+param topLevelManagementGroupName string
 
 param initiatives definitions.setDefinitionsType = [
   {
@@ -29,7 +33,7 @@ param initiatives definitions.setDefinitionsType = [
   }
 ]
 
-module assignment '../bicep/modules/assignment.bicep' = {
+module assignment '../../bicep/modules/assignment.bicep' = {
   name: 'policy-${policyName}'
   params: {
     policyName: policyName

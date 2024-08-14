@@ -1,4 +1,4 @@
-import * as definitions from '../bicep/modules/assignment.bicep'
+import * as definitions from '../../bicep/modules/assignment.bicep'
 
 targetScope = 'managementGroup'
 
@@ -6,6 +6,8 @@ param policyName string = 'allowedResourceTypes'
 param displayName string = 'allowed resource types'
 param location string
 param identityResoruceId string
+#disable-next-line no-unused-params
+param topLevelManagementGroupName string
 param listOfResourceTypesAllowed array = [
   'Microsoft.ManagedIdentity/userAssignedIdentities'
   'Microsoft.ManagedIdentity/userAssignedIdentities/federatedIdentityCredentials'
@@ -27,7 +29,7 @@ param initiative definitions.setDefinitionsType = [
   }
 ]
 
-module assignment '../bicep/modules/assignment.bicep' = {
+module assignment '../../bicep/modules/assignment.bicep' = {
   name: 'policy-${policyName}'
   params: {
     location: location

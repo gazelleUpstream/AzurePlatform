@@ -6,7 +6,7 @@ var customDefinitions = [
 ]
 
 @batchSize(10)
-module abc '../bicep/modules/policyDefinitions.bicep' = [for item in customDefinitions: {
+module abc '../../bicep/modules/policyDefinitions.bicep' = [for item in customDefinitions: {
   name: 'definition-${item.name}'
   params: {
     policyName: item.name

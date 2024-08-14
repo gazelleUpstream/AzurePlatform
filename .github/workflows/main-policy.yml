@@ -1,4 +1,4 @@
-name: az - policy assignment
+name: az - policy
 
 on:
   push:
@@ -6,8 +6,8 @@ on:
       - main
     paths:
         - 'policy/**'
-        - '.github/workflows/template-policyAssignment.yml'
-        - '.github/workflows/main-policyAssignment.yml'
+        - '.github/workflows/template-policy.yml'
+        - '.github/workflows/main-policy.yml'
 
   pull_request_target:
     types:
