@@ -1,7 +1,8 @@
 targetScope = 'managementGroup'
 
+param policyName string = 'foo'
+param displayName string = 'foo'
 param favPolicyValue string
-// param anotherPolicyValue string
 param laEffect string
 param diagnosticSettingName string
 param categoryGroup string
@@ -9,48 +10,33 @@ param logAnalytics string
 param identityResoruceId string
 param location string
 
-var favoriteCustomPolicy = loadJsonContent('customDefinitions/st_vnetAclrRules.json')
-// var anotherCoolPolicy = loadJsonContent('../parameters/customDefinitions/st_corssTenantReplication.json')
+var shortenPolicyName = take(policyName, 24)
 
-module favortitePolicy '../bicep/modules/policyDefinitions.bicep' = {
-  name: 'my-favorite-custom-policy'
+var randomCucstomDfinition = loadJsonContent('customDefinitions/st_vnetAclrRules.json')
+
+module customDefinition '../bicep/modules/policyDefinitions.bicep' = {
+  name: 'definition-${policyName}-vnetRules'
   params: {
-    policyName: favoriteCustomPolicy.name
-    policyProperties: favoriteCustomPolicy.properties
+    policyName: randomCucstomDfinition.name
+    policyProperties: randomCucstomDfinition.properties
   }
 }
 
-// module anotherPolicy 'modules/policyDefinitions.bicep' = {
-//   name: 'another-cool-policy'
-//   params: {
-//     policyName: anotherCoolPolicy.name
-//     policyProperties: anotherCoolPolicy.properties
-//   }
-// }
-
 module setDefinition '../bicep/modules/policySetDefinitions.bicep' = {
-  name: 'my-custom-init'
+  name: 'setDefinition-${policyName}'
   params: {
-    policyName: 'something-cool'
-    setDeinitions: [
+    policyName: shortenPolicyName
+    displayName: displayName
+    setDefinitions: [
       {
-        policyDefinitionId: favortitePolicy.outputs.resourcrId
-        policyDefinitionReferenceId: favortitePolicy.outputs.name
+        policyDefinitionId: customDefinition.outputs.resourcrId
+        policyDefinitionReferenceId: customDefinition.outputs.name
         parameters: {
           effect: {
             value: favPolicyValue
           }
         }
       }
-      // {
-      //   policyDefinitionId: anotherPolicy.outputs.resourcrId
-      //   policyDefinitionReferenceId: anotherPolicy.outputs.name
-      //   parameters: {
-      //     effect: {
-      //       value: anotherPolicyValue
-      //     }
-      //   }
-      // }
       {
         policyDefinitionId: '/providers/Microsoft.Authorization/policyDefinitions/818719e5-1338-4776-9a9d-3c31e4df5986'
         policyDefinitionReferenceId: 'logAnalytics'
@@ -74,10 +60,10 @@ module setDefinition '../bicep/modules/policySetDefinitions.bicep' = {
 }
 
 module assignment '../bicep/modules/policyAssignments.bicep' = {
-  name: 'my-facorite-policy'
+  name: 'assignment-${policyName}'
   params: {
-    policyName: setDefinition.outputs.name
-    displayName: setDefinition.outputs.name
+    policyName: shortenPolicyName
+    displayName: displayName
     location: location
     identityResourceId: identityResoruceId
     setDefinitionId: setDefinition.outputs.resourceId

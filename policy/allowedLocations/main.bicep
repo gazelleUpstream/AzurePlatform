@@ -1,14 +1,19 @@
 targetScope = 'managementGroup'
 
+param policyName string = 'allowedLocations'
+param displayName string = 'allowed Locations'
 param listOfAllowedLocations array
 param identityResoruceId string
 param location string
 
+var shortenPolicyName = take(policyName, 24)
+
 module setDefinition '../bicep/modules/policySetDefinitions.bicep' = {
-  name: 'policy-allowed-location'
+  name: 'initiative-${policyName}'
   params: {
-    policyName: 'allowed-location'
-    setDeinitions: [
+    policyName: shortenPolicyName
+    displayName: displayName
+    setDefinitions: [
       {
         policyDefinitionId: '/providers/Microsoft.Authorization/policyDefinitions/e56962a6-4747-49cd-b67b-bf8b01975c4c'
         policyDefinitionReferenceId: 'allowedResourceLocations'
@@ -32,10 +37,10 @@ module setDefinition '../bicep/modules/policySetDefinitions.bicep' = {
 }
 
 module assignment '../bicep/modules/policyAssignments.bicep' = {
-  name: 'my-facorite-policy'
+  name: 'assignment-${policyName}'
   params: {
-    policyName: setDefinition.outputs.name
-    displayName: setDefinition.outputs.name
+    policyName: shortenPolicyName
+    displayName: displayName
     location: location
     identityResourceId: identityResoruceId
     setDefinitionId: setDefinition.outputs.resourceId

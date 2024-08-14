@@ -1,17 +1,16 @@
 targetScope = 'managementGroup'
 
 param policyName string
-
-param setDeinitions setDefinitionsType
-
+param displayName string
+param setDefinitions setDefinitionsType
 
 resource initiative 'Microsoft.Authorization/policySetDefinitions@2023-04-01' = {
   name: policyName
   properties: {
-    policyDefinitions: setDeinitions
+    displayName: displayName
+    policyDefinitions: setDefinitions
   }
 }
-
 
 type setDefinitionsType = {
     policyDefinitionId: string
