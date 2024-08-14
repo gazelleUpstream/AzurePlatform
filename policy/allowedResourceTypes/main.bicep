@@ -1,39 +1,39 @@
+import * as definitions from '../bicep/modules/assignment.bicep'
+
 targetScope = 'managementGroup'
 
 param policyName string = 'allowedResourceTypes'
 param displayName string = 'allowed resource types'
-param listOfResourceTypesAllowed array
-param identityResoruceId string
 param location string
+param identityResoruceId string
+param listOfResourceTypesAllowed array = [
+  'Microsoft.ManagedIdentity/userAssignedIdentities'
+  'Microsoft.ManagedIdentity/userAssignedIdentities/federatedIdentityCredentials'
+  'Microsoft.OperationalInsights/workspaces'
+  'Microsoft.Resources/deploymentStacks'
+  'Microsoft.Resources/resourceGroups'
+  'Microsoft.Resources/tags'
+]
 
-var shortenPolicyName = take(policyName, 24)
-
-module setDefinition '../bicep/modules/policySetDefinitions.bicep' = {
-  name: 'initiative-${policyName}'
-  params: {
-    policyName: shortenPolicyName
-    displayName: displayName
-    setDefinitions: [
-      {
-        policyDefinitionId: '/providers/Microsoft.Authorization/policyDefinitions/a08ec900-254a-4555-9bf5-e42af04b5c5c'
-        policyDefinitionReferenceId: 'allowedResources'
-        parameters: {
-          listOfResourceTypesAllowed: {
-            value: listOfResourceTypesAllowed
-          }
-        }
+param initiative definitions.setDefinitionsType = [
+  {
+    policyDefinitionId: '/providers/Microsoft.Authorization/policyDefinitions/a08ec900-254a-4555-9bf5-e42af04b5c5c'
+    policyDefinitionReferenceId: 'allowedResources'
+    parameters: {
+      listOfResourceTypesAllowed: {
+        value: listOfResourceTypesAllowed
       }
-    ]
+    }
   }
-}
+]
 
-module assignment '../bicep/modules/policyAssignments.bicep' = {
-  name: 'assignment-${policyName}'
+module assignment '../bicep/modules/assignment.bicep' = {
+  name: 'policy-${policyName}'
   params: {
-    policyName: shortenPolicyName
-    displayName: displayName
     location: location
     identityResourceId: identityResoruceId
-    setDefinitionId: setDefinition.outputs.resourceId
+    setDefinitions: initiative
+    policyName: policyName
+    displayName: displayName
   }
 }

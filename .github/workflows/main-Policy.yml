@@ -1,4 +1,4 @@
-name: az - Policy
+name: az - policy assignment
 
 on:
   push:
@@ -6,8 +6,8 @@ on:
       - main
     paths:
         - 'policy/**'
-        - '.github/workflows/template-Policy.yml'
-        - '.github/workflows/main-Policy.yml'
+        - '.github/workflows/template-policyAssignment.yml'
+        - '.github/workflows/main-policyAssignment.yml'
 
   pull_request_target:
     types:
@@ -25,7 +25,7 @@ jobs:
   test:
     if: (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main') ||
         github.ref != 'refs/heads/main'
-    uses: ./.github/workflows/template-Policy.yml
+    uses: ./.github/workflows/template-policy.yml
     with:
       managementGroupHierarchy: test
     secrets: inherit
@@ -33,7 +33,7 @@ jobs:
   prod:
     if: (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
          github.event.pull_request.merged == true
-    uses: ./.github/workflows/template-Policy.yml
+    uses: ./.github/workflows/template-policy.yml
     with:
       managementGroupHierarchy: prod
     secrets: inherit

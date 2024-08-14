@@ -1,7 +1,7 @@
 {
-    "name": "st_vnetAclrRules",
+    "name": "st_virtualNetworkRules",
     "properties": {
-        "DisplayName": "my favorite policy",
+        "DisplayName": "disable virtual service rules",
         "mode": "All",
         "metadata": {
             "category": "Storage"

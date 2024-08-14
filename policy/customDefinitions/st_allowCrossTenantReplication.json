@@ -1,5 +1,5 @@
 {
-    "name": "st_crossTenantReplication",
+    "name": "st_allowCrossTenantReplication",
     "properties": {
         "DisplayName": "another cool policy",
         "mode": "All",

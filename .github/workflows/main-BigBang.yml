@@ -48,7 +48,7 @@ jobs:
     needs: 
       - identity
       - management
-    uses: ./.github/workflows/template-Policy.yml
+    uses: ./.github/workflows/template-policy.yml
     with:
       managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy }}
     secrets: inherit
