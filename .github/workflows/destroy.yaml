@@ -1,0 +1,55 @@
+name: Destory test environment
+
+on:
+  workflow_dispatch:
+    inputs:
+      topLevelManagementGroup:
+        required: true
+        default: 'gazelle-test'
+
+permissions:
+  id-token: write
+  contents: read
+  
+jobs:
+  cancel-landingzone:
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Azure login
+      uses: azure/login@v2
+      with:
+        client-id: ${{ vars.AZURE_PLATFORM_CLIENT_ID }}
+        tenant-id: ${{ vars.AZURE_TENANT_ID}}
+        allow-no-subscriptions: true
+        enable-AzPSSession: true
+
+    - name: Run Azure PowerShell inline script
+      uses: azure/powershell@v2
+      with:
+        azPSVersion: "latest"
+        inlineScript: |
+          function move-subscriptions {
+            param (
+                [Parameter(Mandatory = $true)]
+                [string]$managementGroup
+            )
+
+            $query = "resourcecontainers
+              | where type == 'microsoft.resources/subscriptions'
+              | where properties['managementGroupAncestorsChain'] contains '$managementGroup'
+              | project subscriptionId"
+
+            $subscriptions = Search-AzGraph -Query $query
+
+            foreach ($item in $subscriptions) {
+                $id = [string]$item.subscriptionId
+                New-AzManagementGroupSubscription -GroupName $managementGroup -SubscriptionId $id -WhatIf
+                Write-Output "----------------"
+            }
+          }
+          
+          move-subscriptions -managementGroup ${{ inputs.topLevelManagementGroup }}
