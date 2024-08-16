@@ -11,9 +11,6 @@ on:
           - test
           - prod
 
-env:
-  topLevelManagementGroup: ${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }}
-
 permissions:
   id-token: write
   contents: read
@@ -21,7 +18,9 @@ permissions:
 jobs:
   destroy:
     runs-on: ubuntu-latest
-    environment: test
+    environment: ${{ inputs.environment }}
+    env:
+      topLevelManagementGroup: ${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
