@@ -1,18 +1,25 @@
-name: Destory test environment
+name: Destory Azure platform
 
 on:
   workflow_dispatch:
     inputs:
-      topLevelManagementGroup:
+      environment:
         required: true
-        default: 'gazelle-test'
+        default: 'test'
+        type: choice
+        options:
+          - test
+          - prod
+
+env:
+  topLevelManagementGroup: ${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }}
 
 permissions:
   id-token: write
   contents: read
   
 jobs:
-  cancel-landingzone:
+  destroy:
     runs-on: ubuntu-latest
     environment: test
     steps:
@@ -27,29 +34,47 @@ jobs:
         allow-no-subscriptions: true
         enable-AzPSSession: true
 
-    - name: Run Azure PowerShell inline script
+    - name: move subscriptions
       uses: azure/powershell@v2
       with:
         azPSVersion: "latest"
         inlineScript: |
-          function move-subscriptions {
-            param (
-                [Parameter(Mandatory = $true)]
-                [string]$managementGroup
-            )
-
-            $query = "resourcecontainers
-              | where type == 'microsoft.resources/subscriptions'
-              | where properties['managementGroupAncestorsChain'] contains '$managementGroup'
-              | project subscriptionId"
-
-            $subscriptions = Search-AzGraph -Query $query
-
-            foreach ($item in $subscriptions) {
-                $id = [string]$item.subscriptionId
-                New-AzManagementGroupSubscription -GroupName $managementGroup -SubscriptionId $id -WhatIf
-                Write-Output "----------------"
-            }
+          $params = @{
+            managementGroup = '${{ env.topLevelManagementGroup }}'
           }
-          
-          move-subscriptions -managementGroup ${{ inputs.topLevelManagementGroup }}
+          write-output $params
+          ./.github/pwsh/move-subscriptions.ps1 @params
+
+    - name: remove management group
+      uses: azure/powershell@v2
+      with:
+        azPSVersion: "latest"
+        inlineScript: |
+          $params = @{
+            managementGroup = '${{ env.topLevelManagementGroup }}'
+          }
+          write-output $params
+          ./.github/pwsh/remove-managementGroups.ps1 @params
+
+    - name: remove deployment
+      uses: azure/powershell@v2
+      with:
+        azPSVersion: "latest"
+        inlineScript: |
+          $deploymants =Get-AzManagementGroupDeployment -ManagementGroupId '${{ env.topLevelManagementGroup }}'
+          $deploymants.Count
+          $deploymants | foreach-object -ThrottleLimit 25 -Parallel {
+              Remove-AzManagementGroupDeployment -Id $_.Id -verbose
+          }
+
+    - name: remove RBAC
+      uses: azure/powershell@v2
+      with:
+        azPSVersion: "latest"
+        inlineScript: |
+          get-AzRoleAssignment -scope '/providers/Microsoft.Management/managementGroups/gazelle-test'
+          $params = @{
+            managementGroup = '${{ env.topLevelManagementGroup }}'
+          }
+          write-output $params
+          ./.github/pwsh/remove-rbacAssignments.ps1 @params
