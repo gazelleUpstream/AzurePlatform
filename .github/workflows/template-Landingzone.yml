@@ -28,11 +28,6 @@ jobs:
         - name: Checkout local
           uses: actions/checkout@v4
 
-        - name: Checkout azurePlatform
-          uses: actions/checkout@v4
-          with:
-            repository: gazelle-cloud/azurePlatform
-
         - name: get github token
           id: github-token
           uses: actions/create-github-app-token@v1
@@ -92,6 +87,11 @@ jobs:
                 az account management-group subscription add \
                   --name ${{ env.managementGroupName }}-${{ env.managementGroupHierarchy}} \
                   --subscription ${{ env.subscriptionId}}
+
+        - name: Checkout azurePlatform
+          uses: actions/checkout@v4
+          with:
+            repository: gazelle-cloud/azurePlatform
 
         - name: create landingzone
           uses: azure/cli@v2
