@@ -12,6 +12,9 @@ on:
         location:
             default: ${{ vars.AZURE_DEFAULT_LOCATION }}
             type: string
+        mainBicep:
+            default: ./Landingzone/bicep/main.bicep
+            type: string
         parameterFile:
             required: true
             type: string
@@ -106,7 +109,7 @@ jobs:
                 deployment=$(az stack sub create \
                 --name "landingzone-init" \
                 --location ${{ inputs.location }} \
-                --template-file ./Landingzone/bicep/main.bicep \
+                --template-file ${{ inputs.mainBicep }} \
                 --parameters params=$params \
                 --deny-settings-mode 'denyWriteAndDelete' \
                 --action-on-unmanage 'deleteAll' \
