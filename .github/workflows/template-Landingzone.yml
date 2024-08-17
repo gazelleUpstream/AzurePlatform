@@ -13,7 +13,7 @@ on:
             default: ${{ vars.AZURE_DEFAULT_LOCATION }}
             type: string
         mainBicep:
-            default: ./Landingzone/bicep/main.bicep
+            default: gazelle-cloud/azurePlatform/Landingzone/bicep/main.bicep@main
             type: string
         parameterFile:
             required: true
