@@ -13,7 +13,7 @@ on:
             default: ${{ vars.AZURE_DEFAULT_LOCATION }}
             type: string
         mainBicep:
-            default: gazelle-cloud/azurePlatform/.github/Landingzone/bicep/main.bicep@main
+            default: ./Landingzone/bicep/main.bicep
             type: string
         parameterFile:
             required: true
@@ -25,8 +25,14 @@ jobs:
         runs-on: ubuntu-latest
         environment: ${{ inputs.managementGroupHierarchy }}
         steps:
-        - name: Checkout
+        - name: Checkout local
           uses: actions/checkout@v4
+
+        - name: Checkout azurePlatform
+          uses: actions/checkout@v4
+          with:
+            repository: gazelle-cloud/azurePlatform
+            path: Landingzone
 
         - name: get github token
           id: github-token
