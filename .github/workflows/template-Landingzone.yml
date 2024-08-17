@@ -100,10 +100,7 @@ jobs:
           uses: azure/cli@v2
           with:
               inlineScript: |
-                ls
-                cd Landingzone
                 echo "Current directory: $(pwd)"
-                ls
                 params=$(jq -c . < ${{ inputs.parameterFile }})
                 echo "JSON content: $params"
                 
