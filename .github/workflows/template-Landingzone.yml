@@ -34,7 +34,7 @@ jobs:
           uses: actions/checkout@v4
           with:
             repository: gazelle-cloud/azurePlatform
-            path: Landingzone
+            path: ./
 
         - name: get github token
           id: github-token
