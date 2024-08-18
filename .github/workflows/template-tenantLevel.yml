@@ -52,8 +52,9 @@ jobs:
                --parameters topLevelManagementGroupName=${{ env.topLevelManagementGroupId }}
 
     Billing:
+        if: ${{ inputs.managementGroupHierarchy == 'prod' }}
         runs-on: ubuntu-latest
-        environment: ${{ inputs.managementGroupHierarchy }}
+        environment: prod
         steps:
         - name: Checkout
           uses: actions/checkout@v4
@@ -83,7 +84,7 @@ jobs:
                --location ${{  vars.AZURE_DEFAULT_LOCATION }} \
                --management-group-id ${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \
                --template-file ./tenantLevel/bicep/billing.bicep \
-               --parameters ./tenantLevel/parameters/billing-${{ inputs.managementGroupHierarchy }}.bicepparam)
+               --parameters ./tenantLevel/parameters/billing.bicepparam)
 
               envVariables=$(echo $deployment | jq '.properties.outputs.gitHubEnviromentVariables.value')
               echo "Deployment Outputs: $envVariables"
