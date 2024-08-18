@@ -103,6 +103,6 @@ jobs:
                   value=$(echo $obj | jq --arg k "$key" -r '.[$k]')
                   gh variable set $key \
                     --body "$value" \
-                    -R "${{ github.repository_owner }}/AzurePlatform"
+                    -R "${{ github.repository_owner }}/landingzones"
                 done
               done
