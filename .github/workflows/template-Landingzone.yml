@@ -23,7 +23,7 @@ on:
 jobs:
     create-landingzone:
         runs-on: ubuntu-latest
-        environment: ${{ inputs.managementGroupHierarchy }}
+        environment: prod
         steps:
         - name: Checkout local
           uses: actions/checkout@v4
