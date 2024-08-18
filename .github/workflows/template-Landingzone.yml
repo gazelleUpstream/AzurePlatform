@@ -76,7 +76,6 @@ jobs:
           if: ${{ env.subscriptionId == null }}
           env:
             invoiceSection: "billingScope_${{ env.billingScope }}"
-
           uses: azure/cli@v2
           with:
               inlineScript: |
