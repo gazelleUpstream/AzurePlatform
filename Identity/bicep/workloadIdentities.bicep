@@ -17,7 +17,7 @@ module IdentityResourceGroup 'br/public:avm/res/resources/resource-group:0.2.4' 
   }
 }
 
-module managedIdentity 'modules/uami.bicep' = [
+module workloadIdentity 'modules/uami.bicep' = [
   for (item, i) in items(identity): {
     scope: resourceGroup(subscriptionId, resourceGroupName)
     dependsOn: [
@@ -37,7 +37,7 @@ module rbac 'modules/roleAssignment.bicep' = [
     scope: managementGroup(item.value.rbac.scope)
     name: 'role-${item.key}'
     params: {
-      principlesId: managedIdentity[i].outputs.principalId
+      principlesId: workloadIdentity[i].outputs.principalId
       roleDefinitions: item.value.rbac.roleDefinitions
     }
   }
@@ -45,8 +45,8 @@ module rbac 'modules/roleAssignment.bicep' = [
 
 output gitHubEnviromentVariables array = [
   for (item, i) in items(identity): {
-    '${item.key}_Principal_Id': managedIdentity[i].outputs.principalId
-    '${item.key}_Resource_Id': managedIdentity[i].outputs.resourceId
-    '${item.key}_Client_Id': managedIdentity[i].outputs.clientId
+    '${item.key}_Principal_Id': workloadIdentity[i].outputs.principalId
+    '${item.key}_Resource_Id': workloadIdentity[i].outputs.resourceId
+    '${item.key}_Client_Id': workloadIdentity[i].outputs.clientId
   }
 ]

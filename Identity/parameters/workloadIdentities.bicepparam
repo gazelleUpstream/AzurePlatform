@@ -1,6 +1,6 @@
-using '../bicep/managedIdentities.bicep'
+using '../bicep/workloadIdentities.bicep'
 
-param workloadName = 'identity'
+param workloadName = 'workloadIdentity'
 param location = readEnvironmentVariable('AZURE_DEFAULT_LOCATION', '')
 param environment = readEnvironmentVariable('managementGroupHierarchy', '')
 param subscriptionId = readEnvironmentVariable('MANAGEMENT_SUBSCRIPTION_ID', '')

@@ -52,4 +52,13 @@ jobs:
     with:
       managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy }}
     secrets: inherit
+
+  # managementSubscription:
+  #   needs: 
+  #     - identity
+  #     - management
+  #   uses: ./.github/workflows/template-policy.yml
+  #   with:
+  #     managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy }}
+  #   secrets: inherit
   
