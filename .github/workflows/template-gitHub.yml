@@ -49,8 +49,8 @@ jobs:
                 --env ${{ inputs.managementGroupHierarchy }} \
                 -R "${{ github.repository_owner }}/AzurePlatform"
 
-              gh variable set AZURE_PLATFORM_TEST_PRINCIPAL_ID \
-                --body ${{ vars.INIT_AZURE_PLATFORM_PRINCIPAL_ID_TEST }}  \
+              gh variable set AZURE_PLATFORM_PROD_PRINCIPAL_ID \
+                --body ${{ vars.INIT_AZURE_PLATFORM_PRINCIPAL_ID_PROD }}  \
                 --env ${{ inputs.managementGroupHierarchy }} \
                 -R "${{ github.repository_owner }}/AzurePlatform"
 

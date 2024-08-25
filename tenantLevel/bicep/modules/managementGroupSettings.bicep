@@ -1,6 +1,6 @@
 targetScope = 'managementGroup'
 
-param defaultManagementGroup string = 'playground-prod'
+param defaultManagementGroup string
 param requireAuthorizationForGroupCreation bool = true
 
 resource managementGroup 'Microsoft.Management/managementGroups/settings@2023-04-01' = {

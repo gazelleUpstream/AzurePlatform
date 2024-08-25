@@ -77,30 +77,31 @@ jobs:
       runs-on: ubuntu-latest
       environment: ${{ inputs.managementGroupHierarchy }}
       steps:
-        - name: Checkout
-          uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-        - name: Azure login
-          uses: azure/login@v2
-          with:
-            client-id: ${{ vars.AZURE_PLATFORM_CLIENT_ID }}
-            tenant-id: ${{ vars.AZURE_TENANT_ID}}
-            allow-no-subscriptions: true
-            enable-AzPSSession: false
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_PLATFORM_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID}}
+          allow-no-subscriptions: true
+          enable-AzPSSession: false
 
-        - name: entraGroups
-          uses: azure/cli@v2
-          with:
-            inlineScript: |
-              deployment=$(az deployment mg create \
-                --name RBAC \
-                --location ${{ vars.AZURE_DEFAULT_LOCATION }} \
-                --management-group-id ${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \
-                --template-file './Identity/bicep/rbac.bicep' \
-                --parameters './Identity/parameters/rbac.bicepparam' \
-                --parameters azurePlatformTestPrincipalId=${{ vars.AZURE_PLATFORM_TEST_PRINCIPAL_ID }} \
-                --parameters environment=${{ inputs.managementGroupHierarchy }})
+      - name: entraGroups
+        uses: azure/cli@v2
+        with:
+          inlineScript: |
+            deployment=$(az deployment mg create \
+              --name RBAC \
+              --location ${{ vars.AZURE_DEFAULT_LOCATION }} \
+              --management-group-id ${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \
+              --template-file './Identity/bicep/rbac.bicep' \
+              --parameters './Identity/parameters/rbac.bicepparam' \
+              --parameters environment=${{ inputs.managementGroupHierarchy }} \
+              --parameters azurePlatformProdPrincipalId=${{ vars.AZURE_PLATFORM_PROD_PRINCIPAL_ID }} \
+              --parameters topLevelManagementGroupName=${{  vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }})
 
-              envVariables=$(echo $deployment | jq '.outputs.gitHubEnviromentVariables.value')
-              echo "Deployment Outputs: $envVariables"
-              echo "RBAC=$(echo $envVariables | jq -c .)" >> $GITHUB_ENV
+            envVariables=$(echo $deployment | jq '.outputs.gitHubEnviromentVariables.value')
+            echo "Deployment Outputs: $envVariables"
+            echo "RBAC=$(echo $envVariables | jq -c .)" >> $GITHUB_ENV

@@ -34,6 +34,20 @@ jobs:
         allow-no-subscriptions: true
         enable-AzPSSession: true
 
+    - name: reset hierarchy settings
+      uses: azure/powershell@v2
+      if: ${{ inputs.environment == 'prod' }}
+      with:
+        azPSVersion: "latest"
+        inlineScript: |
+          $params = @{
+            GroupName = '${{ vars.AZURE_TENANT_ID }}'
+            DefaultManagementGroup = '/providers/Microsoft.Management/managementGroups/${{ vars.AZURE_TENANT_ID}}'
+            Authorization = $false
+          }
+          write-output $params
+          new-azManagementGroupHierarchySetting @params
+
     - name: move subscriptions
       uses: azure/powershell@v2
       with:
