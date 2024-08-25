@@ -70,6 +70,6 @@ jobs:
               --body ${{ vars.INIT_AZURE_PLATFORM_CLIENT_ID_PROD }} \
               -R "${{ github.repository_owner }}/landingzones"
 
-              gh variable set AAZURE_PLATFORM_PRINCIPAL_ID \
+              gh variable set AZURE_PLATFORM_PRINCIPAL_ID \
               --body ${{ vars.INIT_AZURE_PLATFORM_PRINCIPAL_ID_PROD }} \
               -R "${{ github.repository_owner }}/landingzones"
