@@ -30,13 +30,16 @@ jobs:
           uses: azure/cli@v2
           with:
             inlineScript: |
-              az role assignment create --assignee ${{ vars.AZURE_PLATFORM_PRINCIPAL_ID }} \
-               --role "Contributor" \
-               --scope ${{ env.topLevelManagementGroupId }}
-
-              az role assignment create --assignee ${{ vars.AZURE_PLATFORM_PRINCIPAL_ID }} \
-               --role "Azure Deployment Stack Owner" \
-               --scope ${{ env.topLevelManagementGroupId }}
+              deployment=$(az stack mg create \
+                --name tennatLevel-initialRBAC \
+                --management-group-id ${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \
+                --location ${{  vars.AZURE_DEFAULT_LOCATION }} \
+                --template-file ./tenantLevel/bicep/identity.bicep \
+                --parameters ./tenantLevel/parameters/identity.bicepparam \
+                --parameters azurePlatformPrincipalId=${{ vars.AZURE_PLATFORM_PRINCIPAL_ID }} \
+                --deny-settings-mode None \
+                --action-on-unmanage deleteAll \
+                --yes)
 
     ManagementGroups:
         runs-on: ubuntu-latest
@@ -58,14 +61,17 @@ jobs:
           uses: azure/cli@v2
           with:
             inlineScript: |
-              az deployment mg create \
-              --name managementGroups \
+              az stack mg create \
+              --name tennatLevel-managementGroups \
               --location ${{  vars.AZURE_DEFAULT_LOCATION }} \
               --management-group-id ${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \
               --template-file ./tenantLevel/bicep/managementGroups.bicep \
               --parameters ./tenantLevel/parameters/managementGroups.bicepparam \
               --parameters environment=${{ inputs.managementGroupHierarchy }} \
-              --parameters topLevelManagementGroupName=${{ env.topLevelManagementGroupId }}
+              --parameters topLevelManagementGroupName=${{ env.topLevelManagementGroupId }} \
+              --deny-settings-mode None \
+              --action-on-unmanage deleteAll \
+              --yes
 
     Billing:
         if: ${{ inputs.managementGroupHierarchy == 'prod' }}

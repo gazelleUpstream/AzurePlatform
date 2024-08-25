@@ -59,16 +59,16 @@ jobs:
           write-output $params
           ./.github/destoryPlatform/move-subscriptions.ps1 @params
 
-    - name: remove management group
-      uses: azure/powershell@v2
-      with:
-        azPSVersion: "latest"
-        inlineScript: |
-          $params = @{
-            managementGroup = '${{ env.topLevelManagementGroup }}'
-          }
-          write-output $params
-          ./.github/destoryPlatform/remove-managementGroups.ps1 @params
+    # - name: remove management group
+    #   uses: azure/powershell@v2
+    #   with:
+    #     azPSVersion: "latest"
+    #     inlineScript: |
+    #       $params = @{
+    #         managementGroup = '${{ env.topLevelManagementGroup }}'
+    #       }
+    #       write-output $params
+    #       ./.github/destoryPlatform/remove-managementGroups.ps1 @params
 
     - name: cleanup deployment history
       uses: azure/powershell@v2
@@ -94,14 +94,14 @@ jobs:
           ./.github/destoryPlatform/remove-deploymentStacks.ps1 @params
     
 
-    - name: remove RBAC
-      uses: azure/powershell@v2
-      with:
-        azPSVersion: "latest"
-        inlineScript: |
-          get-AzRoleAssignment -scope '/providers/Microsoft.Management/managementGroups/gazelle-test'
-          $params = @{
-            managementGroup = '${{ env.topLevelManagementGroup }}'
-          }
-          write-output $params
-          ./.github/destoryPlatform/remove-rbacAssignments.ps1 @params
+    # - name: remove RBAC
+    #   uses: azure/powershell@v2
+    #   with:
+    #     azPSVersion: "latest"
+    #     inlineScript: |
+    #       get-AzRoleAssignment -scope '/providers/Microsoft.Management/managementGroups/gazelle-test'
+    #       $params = @{
+    #         managementGroup = '${{ env.topLevelManagementGroup }}'
+    #       }
+    #       write-output $params
+    #       ./.github/destoryPlatform/remove-rbacAssignments.ps1 @params
