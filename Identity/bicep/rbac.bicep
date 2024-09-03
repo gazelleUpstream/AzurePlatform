@@ -4,6 +4,7 @@ param environment string
 param entraIdGroupOwners array
 param topLevelManagementGroupName string
 
+
 module entraIdGroupReaders 'modules/groups.bicep' = {
   name: 'entra-readers'
   params: {
@@ -12,16 +13,16 @@ module entraIdGroupReaders 'modules/groups.bicep' = {
   }
 }
 
-param azurePlatformProdPrincipalId string
+var rbacMapping = loadJsonContent('../../AzureRoleDefinitions.json')
 
 module rbac 'modules/roleAssignment.bicep' = {
   name: 'rbac-AzureManagementProd'
   scope: managementGroup(topLevelManagementGroupName)
   params: {
-    principlesId: azurePlatformProdPrincipalId
+    principlesId: entraIdGroupReaders.outputs.groupObjectId
+    principalType: 'Group'
     roleDefinitions: [
-      '/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
-      '/providers/Microsoft.Authorization/roleDefinitions/18d7d88d-d35e-4fb5-a5c3-7773c20a72d9'
+      rbacMapping.Reader
     ]
   }
 }

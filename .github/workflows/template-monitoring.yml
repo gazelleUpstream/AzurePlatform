@@ -11,7 +11,7 @@ on:
           type: string
 
 jobs:
-    monitoring:
+    central-logAnalytics:
         runs-on: ubuntu-latest
         environment: ${{ inputs.managementGroupHierarchy }}
         steps:

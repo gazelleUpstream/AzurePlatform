@@ -11,12 +11,20 @@ env:
   topLevelManagementGroupId: /providers/Microsoft.Management/managementGroups/${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }}
 
 jobs:
-    Identity:
+    FetchRoleDefinitions:
         runs-on: ubuntu-latest
         environment: ${{ inputs.managementGroupHierarchy }}
         steps:
-        - name: Checkout
-          uses: actions/checkout@v4
+        - name: get github token
+          id: github-token
+          uses: actions/create-github-app-token@v1
+          with:
+            app-id: ${{ vars.APP_GITHUB_NEWLANDINGZONES_ID }}
+            private-key: ${{ secrets.APP_GITHUB_NEWLANDINGZONES_KEY }}   
+
+        - uses: actions/checkout@v4
+          with:
+            token: ${{ steps.github-token.outputs.token }}
 
         - name: Azure login
           uses: azure/login@v2
@@ -24,26 +32,25 @@ jobs:
             client-id: ${{ vars.AZURE_PLATFORM_CLIENT_ID }}
             tenant-id: ${{ vars.AZURE_TENANT_ID}}
             allow-no-subscriptions: true
-            enable-AzPSSession: false
+            enable-AzPSSession: true
 
-        - name: init RBAC
-          uses: azure/cli@v2
+        - name: fetch role definitions
+          uses: azure/powershell@v2
           with:
+            azPSVersion: "latest"
             inlineScript: |
-              deployment=$(az stack mg create \
-                --name tennatLevel-initialRBAC \
-                --management-group-id ${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \
-                --location ${{  vars.AZURE_DEFAULT_LOCATION }} \
-                --template-file ./tenantLevel/bicep/identity.bicep \
-                --parameters ./tenantLevel/parameters/identity.bicepparam \
-                --parameters azurePlatformPrincipalId=${{ vars.AZURE_PLATFORM_PRINCIPAL_ID }} \
-                --deny-settings-mode None \
-                --action-on-unmanage deleteAll \
-                --yes)
+              ./.github/utils/get-AzureRoleDefinitions.ps1
+
+        - name: push role definitions
+          run: |
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git add .
+            git commit -m "fetch azure role definitions"
+            git push
 
     ManagementGroups:
         runs-on: ubuntu-latest
-        needs: Identity
         environment: ${{ inputs.managementGroupHierarchy }}
         steps:
         - name: Checkout
@@ -76,7 +83,6 @@ jobs:
     Billing:
         if: ${{ inputs.managementGroupHierarchy == 'prod' }}
         runs-on: ubuntu-latest
-        needs: Identity
         environment: prod
         steps:
         - name: Checkout

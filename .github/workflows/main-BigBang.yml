@@ -37,7 +37,7 @@ jobs:
       managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy }}
     secrets: inherit
 
-  management:
+  monitoring:
     needs: tenantLevel
     uses: ./.github/workflows/template-monitoring.yml
     with:
@@ -47,7 +47,7 @@ jobs:
   policy:
     needs: 
       - identity
-      - management
+      - monitoring
     uses: ./.github/workflows/template-policy.yml
     with:
       managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy }}

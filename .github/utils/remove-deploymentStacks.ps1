@@ -15,15 +15,6 @@ $subscriptionStacks | foreach-object -ThrottleLimit 5 -Parallel {
     Remove-AzSubscriptionDeploymentStack -ResourceId $_.id -ActionOnUnmanage DeleteAll -Force -Verbose
 }
 
-
-$managementGroupStacks = Get-AzManagementGroupDeploymentStack -ManagementGroupId $topLevelManagementGroupName | `
-    Where-Object { $_.name -notlike "tennatLevel-initialRBAC" }
-Write-Output "deployment stacks to be deleted:"
-$managementGroupStacks.name
-$managementGroupStacks | foreach-object -ThrottleLimit 5 -Parallel {
-    Remove-AzManagementGroupDeploymentStack -ResourceId $_.id -ActionOnUnmanage DeleteAll -Force -Verbose
-}
-
 $managementGroupStacks = Get-AzManagementGroupDeploymentStack -ManagementGroupId $topLevelManagementGroupName
 Write-Output "deployment stacks to be deleted:"
 $managementGroupStacks.name
