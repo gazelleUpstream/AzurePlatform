@@ -12,7 +12,7 @@ module identity 'modules/identity.bicep' = {
   params: {
     labName: params.labName
     environment: params.environment
-    location: params.location
+    location: deployment().location
     githubRepoName: params.githubRepoName
   }
 }
@@ -22,7 +22,7 @@ module resourceLevelTags 'modules/policyAssignment.bicep' = [
     name: 'lz-tag-${item.key}'
     params: {
       name: 'tag-${item.key}'
-      location: params.location
+      location: deployment().location
       displayName: 'tag: ${item.key}'
       identityResourceId: identity.outputs.resourceId
       policyDefinitionId: '/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26'

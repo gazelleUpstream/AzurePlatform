@@ -7,7 +7,7 @@ param displayName string = 'allowed locations'
 param location string
 param identityResoruceId string
 param listOfAllowedLocations array = [
-  'franceCentral'
+  location
 ]
 #disable-next-line no-unused-params
 param topLevelManagementGroupName string

@@ -64,11 +64,12 @@ jobs:
       with:
         azPSVersion: "latest"
         inlineScript: |
-          $deploymants =Get-AzManagementGroupDeployment -ManagementGroupId '${{ env.topLevelManagementGroup }}'
-          $deploymants.Count
-          $deploymants | foreach-object -ThrottleLimit 25 -Parallel {
-              Remove-AzManagementGroupDeployment -Id $_.Id -verbose
+          $params = @{
+            managementSubscscriptionId  = '${{ env.managementSubscscriptionId }}'
+            topLevelManagementGroupName = '${{ env.topLevelManagementGroup }}'
           }
+          write-output $params
+          ./.github/utils/remove-deploymentHistory.ps1 @params
 
     - name: delete deployment stacks
       uses: azure/powershell@v2
