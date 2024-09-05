@@ -6,15 +6,16 @@ param (
 )
 
 
-$deploymants = Get-AzManagementGroupDeployment -ManagementGroupId $topLevelManagementGroupName
-write-output "management group deployment: $($deploymants.Count)"
-$deploymants | foreach-object -ThrottleLimit 25 -Parallel {
+$MgDeployment = Get-AzManagementGroupDeployment -ManagementGroupId $topLevelManagementGroupName
+write-output "management group deployment: $($MgDeployment.Count)"
+$MgDeployment | foreach-object -ThrottleLimit 25 -Parallel {
     Remove-AzManagementGroupDeployment -Id $_.Id -verbose
 }
 
+Select-AzSubscription $managementSubscscriptionId
 
-$deploymants = Get-AzSubscriptionDeployment -Id $managementSubscscriptionId
-write-output "subscription deployment: $($deploymants.Count)"
-$deploymants | foreach-object -ThrottleLimit 50 -Parallel {
-    Remove-AzSubscriptionDeployment -id $_.id -verbose
+$SubscriptionDeployment = Get-AzSubscriptionDeployment -Id $managementSubscscriptionId
+write-output "subscription deployment: $($SubscriptionDeployment.Count)"
+$SubscriptionDeployment | foreach-object -ThrottleLimit 50 -Parallel {
+    Remove-AzSubscriptionDeployment -Id $_.id -verbose
 }
