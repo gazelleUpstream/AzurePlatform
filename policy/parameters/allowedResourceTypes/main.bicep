@@ -4,7 +4,7 @@ targetScope = 'managementGroup'
 
 param policyName string = 'allowedResourceTypes'
 param displayName string = 'allowed resource types'
-param location string
+param location string = deployment().location
 param identityResoruceId string
 #disable-next-line no-unused-params
 param topLevelManagementGroupName string

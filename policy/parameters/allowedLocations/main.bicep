@@ -4,7 +4,7 @@ targetScope = 'managementGroup'
 
 param policyName string = 'allowedLocations'
 param displayName string = 'allowed locations'
-param location string
+param location string = deployment().location
 param identityResoruceId string
 param listOfAllowedLocations array = [
   location

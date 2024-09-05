@@ -1,8 +1,8 @@
 targetScope = 'subscription'
 
-param workloadName string
+param workloadName string = 'monitoring'
 param environment string
-param location string
+param location string = deployment().location
 
 var name = 'la-${workloadName}-${environment}'
 

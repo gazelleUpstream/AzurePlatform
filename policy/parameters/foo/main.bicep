@@ -10,7 +10,7 @@ param diagnosticSettingName string
 param categoryGroup string
 param logAnalytics string
 param identityResoruceId string
-param location string
+param location string = deployment().location
 param topLevelManagementGroupName string
 
 param initiatives myImports.setDefinitionsType = [

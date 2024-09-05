@@ -2,7 +2,7 @@ targetScope = 'managementGroup'
 
 param workloadName string = 'policy'
 param environment string
-param location string
+param location string = deployment().location
 param subscriptionId string
 param roleDefinitions array
 

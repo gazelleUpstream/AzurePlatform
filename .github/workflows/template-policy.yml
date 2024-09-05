@@ -41,7 +41,6 @@ jobs:
                 --location ${{  vars.AZURE_DEFAULT_LOCATION }} \
                 --template-file ./policy/bicep/policyIdentity.bicep \
                 --parameters './policy/parameters/policyIdentity.bicepparam' \
-                --parameters location=${{  vars.AZURE_DEFAULT_LOCATION }} \
                 --parameters environment=${{ inputs.managementGroupHierarchy }} \
                 --parameters subscriptionId=${{ vars.MANAGEMENT_SUBSCRIPTION_ID }} \
                 --deny-settings-mode None \
@@ -136,7 +135,6 @@ jobs:
                 --location ${{  vars.AZURE_DEFAULT_LOCATION }} \
                 --template-file ./policy/parameters/${{ matrix.policy }}/main.bicep \
                 --parameters ./policy/parameters/${{ matrix.policy }}/${{ matrix.scope }}.bicepparam \
-                --parameters location=${{  vars.AZURE_DEFAULT_LOCATION }} \
                 --parameters identityResoruceId=${{  vars.POLICY_IDENTITY_RESOURCE_ID }} \
                 --parameters topLevelManagementGroupName=${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \
                 --deny-settings-mode None \
@@ -154,7 +152,6 @@ jobs:
                 --location ${{  vars.AZURE_DEFAULT_LOCATION }} \
                 --template-file ./policy/parameters/${{ matrix.policy }}/main.bicep \
                 --parameters ./policy/parameters/${{ matrix.policy }}/${{ matrix.scope }}.bicepparam \
-                --parameters location=${{  vars.AZURE_DEFAULT_LOCATION }} \
                 --parameters identityResoruceId=${{  vars.POLICY_IDENTITY_RESOURCE_ID }} \
                 --parameters logAnalytics=${{ vars.LOGANALYTICS_RESOURCE_ID }} \
                 --parameters topLevelManagementGroupName=${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \

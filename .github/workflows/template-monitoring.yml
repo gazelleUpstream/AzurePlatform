@@ -6,9 +6,6 @@ on:
         managementGroupHierarchy:
           required: true
           type: string
-        mainBicep:
-          default: ./monitoring/bicep/main.bicep
-          type: string
 
 jobs:
     central-logAnalytics:
@@ -44,10 +41,9 @@ jobs:
               deployment=$(az stack sub create \
                 --name monitoring \
                 --location ${{ vars.AZURE_DEFAULT_LOCATION }} \
-                --template-file ${{ inputs.mainBicep }} \
+                --template-file './monitoring/bicep/main.bicep' \
                 --parameters './monitoring/parameters/main.bicepparam' \
                 --parameters environment=${{ inputs.managementGroupHierarchy }} \
-                --parameters location=${{  vars.AZURE_DEFAULT_LOCATION }} \
                 --deny-settings-mode None \
                 --action-on-unmanage deleteAll \
                 --yes)
