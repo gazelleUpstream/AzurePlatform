@@ -1,5 +1,6 @@
 using '../bicep/policyIdentity.bicep'
 
+param workloadName = 'policy'
 param environment = readEnvironmentVariable('managementGroupHierarchy', '')
 param subscriptionId = readEnvironmentVariable('MANAGEMENT_SUBSCRIPTION_ID', '')
 param roleDefinitions = [

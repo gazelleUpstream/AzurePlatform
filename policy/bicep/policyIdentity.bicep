@@ -1,16 +1,16 @@
 targetScope = 'managementGroup'
 
-param workloadName string = 'policy'
+param workloadName string
 param environment string
 param location string = deployment().location
 param subscriptionId string
 param roleDefinitions array
 
-var policyIdentityResourceGroupName = 'Identity-${workloadName}-${environment}'
+var policyIdentityResourceGroupName = '${workloadName}-identity-${environment}'
 
 module IdentityResourceGroup 'modules/resourceGroup.bicep' = {
   scope: subscription(subscriptionId)
-  name: 'rg-identity-${workloadName}'
+  name: 'rg-${workloadName}-identity'
   params: {
     location: location
     resourceGroupName: policyIdentityResourceGroupName
