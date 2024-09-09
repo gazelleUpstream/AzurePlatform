@@ -19,8 +19,8 @@ jobs:
           id: github-token
           uses: actions/create-github-app-token@v1
           with:
-            app-id: ${{ vars.APP_GITHUB_NEWLANDINGZONES_ID }}
-            private-key: ${{ secrets.APP_GITHUB_NEWLANDINGZONES_KEY }}   
+            app-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
+            private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}   
 
         - uses: actions/checkout@v4
           with:
@@ -92,8 +92,8 @@ jobs:
           id: github-token
           uses: actions/create-github-app-token@v1
           with:
-            app-id: ${{ vars.APP_GITHUB_BIGBANG_ID }}
-            private-key: ${{ secrets.APP_GITHUB_BIGBANG }}
+            app-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
+            private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}
             owner: ${{ github.repository_owner }}
 
         - name: Azure login
