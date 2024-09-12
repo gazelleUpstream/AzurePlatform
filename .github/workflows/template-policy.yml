@@ -34,22 +34,23 @@ jobs:
         - name: identity
           uses: azure/cli@v2
           with:
-              inlineScript: |
-                deployment=$(az stack mg create \
-                --name policy-Identity \
-                --management-group-id ${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \
-                --location ${{  vars.AZURE_DEFAULT_LOCATION }} \
-                --template-file ./policy/bicep/policyIdentity.bicep \
-                --parameters './policy/parameters/policyIdentity.bicepparam' \
-                --parameters environment=${{ inputs.managementGroupHierarchy }} \
-                --parameters subscriptionId=${{ vars.MANAGEMENT_SUBSCRIPTION_ID }} \
-                --deny-settings-mode None \
-                --action-on-unmanage deleteAll \
-                --yes)
+            azcliversion: ${{ vars.AZURE_CLI_VERSION }}
+            inlineScript: |
+              deployment=$(az stack mg create \
+              --name policy-Identity \
+              --management-group-id ${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \
+              --location ${{  vars.AZURE_DEFAULT_LOCATION }} \
+              --template-file ./policy/bicep/policyIdentity.bicep \
+              --parameters './policy/parameters/policyIdentity.bicepparam' \
+              --parameters environment=${{ inputs.managementGroupHierarchy }} \
+              --parameters subscriptionId=${{ vars.MANAGEMENT_SUBSCRIPTION_ID }} \
+              --deny-settings-mode None \
+              --action-on-unmanage deleteAll \
+              --yes)
 
-                envVariables=$(echo $deployment | jq '.outputs.gitHubEnviromentVariables.value')
-                echo "Deployment Outputs: $envVariables"
-                echo "policyIdentity=$(echo $envVariables | jq -c .)" >> $GITHUB_ENV
+              envVariables=$(echo $deployment | jq '.outputs.gitHubEnviromentVariables.value')
+              echo "Deployment Outputs: $envVariables"
+              echo "policyIdentity=$(echo $envVariables | jq -c .)" >> $GITHUB_ENV
 
         - name: set env variables
           env:
@@ -85,15 +86,16 @@ jobs:
         - name: custom definitions
           uses: azure/cli@v2
           with:
-              inlineScript: |
-                deployment=$(az stack mg create \
-                --name policy-customDefinitions \
-                --management-group-id ${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \
-                --location ${{  vars.AZURE_DEFAULT_LOCATION }} \
-                --template-file ./policy/parameters/customDefinitions/main.bicep \
-                --deny-settings-mode None \
-                --action-on-unmanage deleteAll \
-                --yes)
+            azcliversion: ${{ vars.AZURE_CLI_VERSION }}
+            inlineScript: |
+              deployment=$(az stack mg create \
+              --name policy-customDefinitions \
+              --management-group-id ${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \
+              --location ${{  vars.AZURE_DEFAULT_LOCATION }} \
+              --template-file ./policy/parameters/customDefinitions/main.bicep \
+              --deny-settings-mode None \
+              --action-on-unmanage deleteAll \
+              --yes)
 
     assignments:
         runs-on: ubuntu-latest
@@ -128,33 +130,35 @@ jobs:
           if: ${{ matrix.policy != 'foo' }}
           uses: azure/cli@v2
           with:
-              inlineScript: |
-                deployment=$(az stack mg create \
-                --name policy-${{ matrix.policy }} \
-                --management-group-id ${{ matrix.scope }}-${{ inputs.managementGroupHierarchy }} \
-                --location ${{  vars.AZURE_DEFAULT_LOCATION }} \
-                --template-file ./policy/parameters/${{ matrix.policy }}/main.bicep \
-                --parameters ./policy/parameters/${{ matrix.policy }}/${{ matrix.scope }}.bicepparam \
-                --parameters identityResoruceId=${{  vars.POLICY_IDENTITY_RESOURCE_ID }} \
-                --parameters topLevelManagementGroupName=${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \
-                --deny-settings-mode None \
-                --action-on-unmanage deleteAll \
-                --yes)
+            azcliversion: ${{ vars.AZURE_CLI_VERSION }}
+            inlineScript: |
+              deployment=$(az stack mg create \
+              --name policy-${{ matrix.policy }} \
+              --management-group-id ${{ matrix.scope }}-${{ inputs.managementGroupHierarchy }} \
+              --location ${{  vars.AZURE_DEFAULT_LOCATION }} \
+              --template-file ./policy/parameters/${{ matrix.policy }}/main.bicep \
+              --parameters ./policy/parameters/${{ matrix.policy }}/${{ matrix.scope }}.bicepparam \
+              --parameters identityResoruceId=${{  vars.POLICY_IDENTITY_RESOURCE_ID }} \
+              --parameters topLevelManagementGroupName=${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \
+              --deny-settings-mode None \
+              --action-on-unmanage deleteAll \
+              --yes)
 
         - name: additional param (log analytics)
           if: ${{ matrix.policy == 'foo' }}
           uses: azure/cli@v2
           with:
-              inlineScript: |
-                deployment=$(az stack mg create \
-                --name policy-${{ matrix.policy }} \
-                --management-group-id ${{ matrix.scope }}-${{ inputs.managementGroupHierarchy }} \
-                --location ${{  vars.AZURE_DEFAULT_LOCATION }} \
-                --template-file ./policy/parameters/${{ matrix.policy }}/main.bicep \
-                --parameters ./policy/parameters/${{ matrix.policy }}/${{ matrix.scope }}.bicepparam \
-                --parameters identityResoruceId=${{  vars.POLICY_IDENTITY_RESOURCE_ID }} \
-                --parameters logAnalytics=${{ vars.LOGANALYTICS_RESOURCE_ID }} \
-                --parameters topLevelManagementGroupName=${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \
-                --deny-settings-mode None \
-                --action-on-unmanage deleteAll \
-                --yes)
+            azcliversion: ${{ vars.AZURE_CLI_VERSION }}
+            inlineScript: |
+              deployment=$(az stack mg create \
+              --name policy-${{ matrix.policy }} \
+              --management-group-id ${{ matrix.scope }}-${{ inputs.managementGroupHierarchy }} \
+              --location ${{  vars.AZURE_DEFAULT_LOCATION }} \
+              --template-file ./policy/parameters/${{ matrix.policy }}/main.bicep \
+              --parameters ./policy/parameters/${{ matrix.policy }}/${{ matrix.scope }}.bicepparam \
+              --parameters identityResoruceId=${{  vars.POLICY_IDENTITY_RESOURCE_ID }} \
+              --parameters logAnalytics=${{ vars.LOGANALYTICS_RESOURCE_ID }} \
+              --parameters topLevelManagementGroupName=${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }} \
+              --deny-settings-mode None \
+              --action-on-unmanage deleteAll \
+              --yes)

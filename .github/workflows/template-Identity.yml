@@ -26,6 +26,7 @@ jobs:
       - name: entraGroups
         uses: azure/cli@v2
         with:
+          azcliversion: ${{ vars.AZURE_CLI_VERSION }}
           inlineScript: |
             deployment=$(az deployment mg create \
               --name RBAC \

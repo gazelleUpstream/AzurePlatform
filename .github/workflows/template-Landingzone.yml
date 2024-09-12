@@ -55,6 +55,7 @@ jobs:
         - name: fetch JSON values
           uses: azure/cli@v2
           with:
+            azcliversion: ${{ vars.AZURE_CLI_VERSION }}
             inlineScript: |
                 params=$(jq -r 'to_entries[] | "\(.key)=\(.value)"' ${{ inputs.parameterFile }})
                 IFS=$'\n'
@@ -68,9 +69,10 @@ jobs:
           if: ${{ env.subscriptionId != null }}
           uses: azure/cli@v2
           with:
-              inlineScript: |
-                az account subscription rename --id ${{ env.subscriptionId}} \
-                  --name ${{ env.managementGroupName }}-${{ env.labName }}-${{ env.environment}}
+            azcliversion: ${{ vars.AZURE_CLI_VERSION }}
+            inlineScript: |
+              az account subscription rename --id ${{ env.subscriptionId}} \
+                --name ${{ env.managementGroupName }}-${{ env.labName }}-${{ env.environment}}
         
         - name: create subscription
           if: ${{ env.subscriptionId == null }}
@@ -78,66 +80,69 @@ jobs:
             invoiceSection: "billingScope_${{ env.billingScope }}"
           uses: azure/cli@v2
           with:
-              inlineScript: |
-                newSubscription=$(az account alias create --workload 'Production' \
-                  --name ${{ env.managementGroupName }}-${{ env.labName }}-${{ env.environment}} \
-                  --display-name ${{ env.managementGroupName }}-${{ env.labName }}-${{ env.environment}} \
-                  --billing-scope ${{ vars[env.invoiceSection] }})
-                echo "Subscription Alias: $newSubscription"
-                subscriptionId=$(echo $newSubscription | jq -r '.properties.subscriptionId')
-                echo "subscriptionId=$subscriptionId" >> $GITHUB_ENV
+            azcliversion: ${{ vars.AZURE_CLI_VERSION }}
+            inlineScript: |
+              newSubscription=$(az account alias create --workload 'Production' \
+                --name ${{ env.managementGroupName }}-${{ env.labName }}-${{ env.environment}} \
+                --display-name ${{ env.managementGroupName }}-${{ env.labName }}-${{ env.environment}} \
+                --billing-scope ${{ vars[env.invoiceSection] }})
+              echo "Subscription Alias: $newSubscription"
+              subscriptionId=$(echo $newSubscription | jq -r '.properties.subscriptionId')
+              echo "subscriptionId=$subscriptionId" >> $GITHUB_ENV
 
         - name: move subscription
           uses: azure/cli@v2
           with:
-              inlineScript: |
-                az account management-group subscription add \
-                  --name ${{ env.managementGroupName }}-${{ env.managementGroupHierarchy}} \
-                  --subscription ${{ env.subscriptionId}}
+            azcliversion: ${{ vars.AZURE_CLI_VERSION }}
+            inlineScript: |
+              az account management-group subscription add \
+                --name ${{ env.managementGroupName }}-${{ env.managementGroupHierarchy}} \
+                --subscription ${{ env.subscriptionId}}
 
         - name: create landingzone
           uses: azure/cli@v2
           with:
-              inlineScript: |
-                echo "Current directory: $(pwd)"
-                params=$(jq -c . < ${{ inputs.parameterFile }})
-                echo "JSON content: $params"
-                
-                az account set --subscription ${{ env.subscriptionId }}
+            azcliversion: ${{ vars.AZURE_CLI_VERSION }}
+            inlineScript: |
+              echo "Current directory: $(pwd)"
+              params=$(jq -c . < ${{ inputs.parameterFile }})
+              echo "JSON content: $params"
+              
+              az account set --subscription ${{ env.subscriptionId }}
 
-                deployment=$(az stack sub create \
-                --name "landingzone-init" \
-                --location ${{ inputs.location }} \
-                --template-file ${{ inputs.mainBicep }} \
-                --parameters params=$params \
-                --deny-settings-mode 'denyWriteAndDelete' \
-                --action-on-unmanage 'deleteAll' \
-                --deny-settings-excluded-principals "${{ vars.AZURE_PLATFORM_PRINCIPAL_ID }}" \
-                --deny-settings-excluded-actions 'Microsoft.ManagedIdentity/userAssignedIdentities/*/assign/action Microsoft.Network/virtualNetworks/subnets/write' \
-                --deny-settings-apply-to-child-scopes $true \
-                --yes)
+              deployment=$(az stack sub create \
+              --name "landingzone-init" \
+              --location ${{ inputs.location }} \
+              --template-file ${{ inputs.mainBicep }} \
+              --parameters params=$params \
+              --deny-settings-mode 'denyWriteAndDelete' \
+              --action-on-unmanage 'deleteAll' \
+              --deny-settings-excluded-principals "${{ vars.AZURE_PLATFORM_PRINCIPAL_ID }}" \
+              --deny-settings-excluded-actions 'Microsoft.ManagedIdentity/userAssignedIdentities/*/assign/action Microsoft.Network/virtualNetworks/subnets/write' \
+              --deny-settings-apply-to-child-scopes $true \
+              --yes)
 
-                envVariables=$(echo $deployment | jq '.outputs.gitHubEnviromentVariables.value')
-                echo "Deployment Outputs: $envVariables"
-                echo "landingzoneInit=$(echo $envVariables | jq -c .)" >> $GITHUB_ENV
+              envVariables=$(echo $deployment | jq '.outputs.gitHubEnviromentVariables.value')
+              echo "Deployment Outputs: $envVariables"
+              echo "landingzoneInit=$(echo $envVariables | jq -c .)" >> $GITHUB_ENV
 
         - name: set env variables
           env:
             GH_TOKEN: ${{ steps.github-token.outputs.token }}
           run: |
-              echo "create environment"
+            echo "create environment"
 
-              gh api --method PUT -H "Accept: application/vnd.github+json" \
-              repos/${{ github.repository_owner }}/${{ env.githubRepoName }}/environments/${{ env.environment }}
-        
-              deploymentOutputs=$(echo $landingzoneInit | jq .)
-              echo "Deployment Outputs: $deploymentOutputs"
+            gh api --method PUT -H "Accept: application/vnd.github+json" \
+            repos/${{ github.repository_owner }}/${{ env.githubRepoName }}/environments/${{ env.environment }}
+      
+            deploymentOutputs=$(echo $landingzoneInit | jq .)
+            echo "Deployment Outputs: $deploymentOutputs"
 
-              keys=$(echo $deploymentOutputs | jq -r 'keys[]')
-              for key in $keys; do
-                value=$(echo $deploymentOutputs | jq --arg k "$key" -r '.[$k]')
-                gh variable set $key \
-                  --body "$value" \
-                  --env ${{ env.environment }} \
-                  -R "${{ github.repository_owner }}/${{ env.githubRepoName }}"
-              done
+            keys=$(echo $deploymentOutputs | jq -r 'keys[]')
+            for key in $keys; do
+              value=$(echo $deploymentOutputs | jq --arg k "$key" -r '.[$k]')
+              gh variable set $key \
+                --body "$value" \
+                --env ${{ env.environment }} \
+                -R "${{ github.repository_owner }}/${{ env.githubRepoName }}"
+            done

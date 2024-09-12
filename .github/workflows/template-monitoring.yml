@@ -35,6 +35,7 @@ jobs:
         - name: logAnalytics
           uses: azure/cli@v2
           with:
+            azcliversion: ${{ vars.AZURE_CLI_VERSION }}
             inlineScript: |
               az account set --subscription ${{ vars.MANAGEMENT_SUBSCRIPTION_ID }}
 
