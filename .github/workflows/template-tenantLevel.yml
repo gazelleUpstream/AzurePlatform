@@ -67,7 +67,7 @@ jobs:
         - name: management group hierarchy
           uses: azure/cli@v2
           with:
-            azcliversion: 2.63.0
+            azcliversion: ${{ vars.AZURE_CLI_VERSION }}
             inlineScript: |
               az stack mg create \
               --name tennatLevel-managementGroups \
