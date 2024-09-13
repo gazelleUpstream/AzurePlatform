@@ -101,7 +101,7 @@ jobs:
                 --name ${{ env.managementGroupName }}-${{ env.managementGroupHierarchy}} \
                 --subscription ${{ env.subscriptionId}}
 
-        - name: retry - move subscription
+        - name: move subscription (retry)
           if: steps.moveSubscription.outcome == 'failure'
           uses: azure/cli@v2
           with:
