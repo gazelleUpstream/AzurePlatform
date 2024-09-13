@@ -107,7 +107,7 @@ jobs:
           with:
             azcliversion: ${{ vars.AZURE_CLI_VERSION }}
             inlineScript: |
-              wait 10
+              sleep 30s
               az account management-group subscription add \
                 --name ${{ env.managementGroupName }}-${{ env.managementGroupHierarchy}} \
                 --subscription ${{ env.subscriptionId}}
