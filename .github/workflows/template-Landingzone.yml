@@ -98,8 +98,8 @@ jobs:
             azcliversion: ${{ vars.AZURE_CLI_VERSION }}
             inlineScript: |
               az account management-group subscription add \
-               ## --name ${{ env.managementGroupName }}-${{ env.managementGroupHierarchy}} \
-               ## --subscription ${{ env.subscriptionId}}
+                --name ${{ env.managementGroupName }}-${{ env.managementGroupHierarchy}} \
+                --subscription ${{ env.subscriptionId}}
 
         - name: retry - move subscription
           if: steps.moveSubscription.outcome == 'failure'
