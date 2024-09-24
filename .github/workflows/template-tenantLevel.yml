@@ -11,44 +11,6 @@ env:
   topLevelManagementGroupId: /providers/Microsoft.Management/managementGroups/${{ vars.TOP_LEVEL_MANAGEMENTGROUP_NAME }}
 
 jobs:
-    FetchRoleDefinitions:
-        runs-on: ubuntu-latest
-        environment: ${{ inputs.managementGroupHierarchy }}
-        steps:
-        - name: get github token
-          id: github-token
-          uses: actions/create-github-app-token@v1
-          with:
-            app-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
-            private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}   
-
-        - uses: actions/checkout@v4
-          with:
-            token: ${{ steps.github-token.outputs.token }}
-
-        - name: Azure login
-          uses: azure/login@v2
-          with:
-            client-id: ${{ vars.AZURE_PLATFORM_CLIENT_ID }}
-            tenant-id: ${{ vars.AZURE_TENANT_ID}}
-            allow-no-subscriptions: true
-            enable-AzPSSession: true
-
-        - name: fetch role definitions
-          uses: azure/powershell@v2
-          with:
-            azPSVersion: "latest"
-            inlineScript: |
-              ./.github/utils/get-AzureRoleDefinitions.ps1
-
-        - name: push role definitions
-          run: |
-            git config --global user.name "github-actions[bot]"
-            git config --global user.email "github-actions[bot]@users.noreply.github.com"
-            git add .
-            git commit -m "fetch azure role definitions"
-            git push
-
     ManagementGroups:
         runs-on: ubuntu-latest
         environment: ${{ inputs.managementGroupHierarchy }}
